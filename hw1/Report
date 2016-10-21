@@ -1,0 +1,39 @@
+>> Platfrom : 
+linux1 in nctucs
+The lex version is 2.6.1
+The gcc (GCC) version is 6.2.1 20160830
+
+>>How to run scanner
+First, you must have two files hw.l and Makefile.
+Second, you just need to command "make" in the local repository where are hw.l and Makefile.
+Note you can’t command “make” too quickly after you paste the repository to your computer because the system need some times to detect the file.
+So you must wait for seconds before command “make”.
+If not you will get warning and may build file incompletely.
+After some seconds, you command “make” and you will get a file named scanner.
+Command "./scanner [input file]", and you will get parser result on your screen.
+
+>>Description : 
+
+This scanner can parser some token below.
+
+Delimites like "," ";" "(" ")" "[" "]" "{" "}"
+
+Arithmetic, Relational, and Logical Operators like "+" "-" "*" "/" "%" "=" "<" "<=" "!=" ">=" ">" "==" "&&" "||" "!".
+
+Keyword like "while" "do" "if" "else" "true" "false" "for" "int" "print" "const" "read" "boolean" "bool" "void" "float" "double" "string" "continue" "break" "return".
+
+Identifier which is a string of letters and digits beginning with letter and the length of Identifier won't exceed 256 like "a123" "erewr" "haha".
+
+Integer Contants which is a sequence of one or more digits starts with a non-zero digit, e.g., 123, 45,6. or a zero digit only, e.g., 0.
+
+Floating-Point Contants which is a sequenceof one or more digits with a dot (.) symbol separating the integral part from the fractional part, e.g., 0.0, 1.23 4.5.
+
+Scientific Notations which is a way of writing numbers that accommodates values too large or small to be conveniently written in standard decimal notation. All numbers are written like aEb or aeb ('a times ten to the power of b'), where the exponent b is an integer that can start with 0s, and the coefficient a is any real numberand also can start with 0s, called the significand, e.g., 1.23E4, 1.23e4, 0123e-2.
+
+String Contents which is a sequence of zero or more ASCII characters appearing between double-quote (") delimites. e.g., "qwe123", "asdf\" s".
+
+Commtents are C-syle which is a text surrounded by "/*" and "*/" delimiters, and C++-style which is textfollowing a "//" delimiter. For example, // 123123123 , /* sdlfj sdlkj*/
+
+We can use #pragma to control whether we show the source, token and statistic on or off. For example, #pragma source off means we turn off the program listing.
+
+
