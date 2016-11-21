@@ -1,5 +1,6 @@
 %{
 #include <bsd/string.h>
+#include <y.tab.h>
 
 #define MAX_LINE_LENGTH 257
 #define MAX_ID_LENGTH 257
@@ -134,106 +135,190 @@ id *new_id();
 	}
 "("	{
 		tokenString("delim", "(");
+		return LPARENTHESES;
 	}
 ")"	{
 		tokenString("delim", ")");
+		return RPARENTHESES;
 	}
 ","	{
 		tokenString("delim", ",");
+		return COMMA;
 	}
 ";"	{
 		tokenString("delim", ";");
+		return SEMICOLON;
 	}
 "["	{
 		tokenString("delim", "[");
+		return LSBRACKETS;
 	}
 "]"	{
 		tokenString("delim", "]");
+		return RSBRACKETS;
 	}
 "{"	{
 		tokenString("delim", "{");
+		return LBRACKETS;
 	}
 "}"	{
 		tokenString("delim", "}");
+		return RBRACKETS;
 	}
 "+"	{
 		token("+");
+		return ADDITION;
 	}
 "-"	{
 		token("-");
+		return SUBSTRACTION;
 	}
 "*"	{
 		token("*");
+		return MULTIPLICATION;
 	}
 "/"	{
 		token("/");
+		return DEVISION;
 	}
 "%"	{
 		token("%");
+		return DIVISION;
 	}
 "="	{
 		token("=");
+		return ASSIGNMENT;
 	}
 "<"	{
 		token("<");
+		return RELATIONAL;
 	}
 "<="	{
 		token("<=");
+		return RELATIONAL;
 	}
 "!="	{
 		token("!=");
+		return RELATIONAL;
 	}
 ">="	{
 		token(">=");
+		return RELATIONAL;
 	}
 ">"	{
 		token(">");
+		return RELATIONAL;
 	}
 "=="	{
 		token("==");
+		return RELATIONAL;
 	}
 "&&"	{
 		token("&&");
+		return LOGICAL;
 	}
 "||"	{
 		token("||");
+		return LOGICAL;
 	}
 "!"	{
 		token("!");
+		return LOGICAL;
 	}
-read |
-boolean |
-while |
-do |
-if |
-else |
-true | 
-false | 
-for | 
-const | 
-int | 
-print |
-bool | 
-void | 
-float | 
-double | 
-string |
-continue | 
-break | 
+read {
+		tokenString("KW", yytext);
+		return READ;
+	}
+boolean {
+		tokenString("KW", yytext);
+		return BOOLEAN;
+	}
+while {
+		tokenString("KW", yytext);
+		return WHILE;
+	}
+do {
+		tokenString("KW", yytext);
+		return DO;
+	}
+if {
+		tokenString("KW", yytext);
+		return IF;
+	}
+else {
+		tokenString("KW", yytext);
+		return ELSE;
+	}
+true {
+		tokenString("KW", yytext);
+		return TRUE;
+	} 
+false {
+		tokenString("KW", yytext);
+		return FALSE;
+	} 
+for {
+		tokenString("KW", yytext);
+		return FOR;
+	} 
+const {
+		tokenString("KW", yytext);
+		return CONST;
+	} 
+int {
+		tokenString("KW", yytext);
+		return INT;
+	} 
+print {
+		tokenString("KW", yytext);
+		return PRINT;
+	}
+bool {
+		tokenString("KW", yytext);
+		return BOOL;
+	} 
+void {
+		tokenString("KW", yytext);
+		return VOID;
+	} 
+float {
+		tokenString("KW", yytext);
+		return FLOAT;
+	} 
+double {
+		tokenString("KW", yytext);
+		return DOUBLE;
+	} 
+string {
+		tokenString("KW", yytext);
+		return STRING;
+	}
+continue {
+		tokenString("KW", yytext);
+		return CONTINUE;
+	}
+break {
+		tokenString("KW", yytext);
+		return BREAK;
+	} 
 return	{
 		tokenString("KW", yytext);
+		return RETURN;
 	}
 
 0 |
 [1-9][0-9]* {
 		tokenString("integer", yytext);
+		return NUMBER;
 	}
 [0-9]+\.[0-9]+	{
 		tokenString("float", yytext);
+		return NUMBER;
 	}
 
 ([0-9]+|([0-9]*\.[0-9]+))([eE][-+]?[0-9]+)	{
 		tokenString("scientific", yytext);
+		return NUMBER;
 	}
 "\""	{ 
 		LIST;
@@ -281,6 +366,7 @@ return	{
 
 <STR>\"	{
 		tokenString("string", strContent);
+		return STRING;
 		BEGIN INITIAL;
 		
 	}
@@ -330,6 +416,7 @@ return	{
 			set(&id_head,yytext);
 		}
 		tokenString("id",yytext);
+		return ID;
 	}
 
 .	{
