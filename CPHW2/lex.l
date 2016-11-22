@@ -366,9 +366,8 @@ return	{
 
 <STR>\"	{
 		tokenString("string", strContent);
-		return STRCONTENT;
 		BEGIN INITIAL;
-		
+		return STRCONTENT;
 	}
 <STR>[^\\\n\"]	{
 		LIST;

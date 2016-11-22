@@ -115,12 +115,12 @@ const_decl  : CONST data_type assignments ';'
 			;
 
 expression  : function_call
-			| variable
+			| STRCONTENT
 			| INTEGER
 			| REALNUMBER
 			| TRUE
 			| FALSE
-			| STRCONTENT
+			| variable
 			;
 
 nonEmptyExpressions : nonEmptyExpressions ',' expression

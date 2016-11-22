@@ -802,7 +802,7 @@ char *yytext;
 #define MAX_LINE_LENGTH 257
 #define MAX_ID_LENGTH 257
 #define MAX_STRING_LENGTH 257
-#define LIST                strcat(buf, yytext, MAX_LINE_LENGTH)
+#define LIST                strcat(buf, yytext)
 #define token(t)            {LIST; if (Opt_Token) printf("<%s>\n", #t);}
 #define tokenInteger(t, i)  {LIST; if (Opt_Token) printf("<%s:%d>\n", t, i);}
 #define tokenString(t, s)   {LIST; if (Opt_Token) printf("<%s:%s>\n", t, s);}
@@ -1680,7 +1680,7 @@ YY_RULE_SETUP
 #line 332 "lex.l"
 {
 		LIST;
-		strlcat (strContent, "\"", MAX_STRING_LENGTH);
+		strcat (strContent, "\"");
 		BEGIN STR;
 	}
 	YY_BREAK
@@ -1689,7 +1689,7 @@ YY_RULE_SETUP
 #line 337 "lex.l"
 {
 		LIST;
-		strlcat( strContent, "\\n", MAX_STRING_LENGTH);
+		strcat( strContent, "\\n");
 		BEGIN STR;
 	}
 	YY_BREAK
@@ -1698,7 +1698,7 @@ YY_RULE_SETUP
 #line 342 "lex.l"
 {
 		LIST;
-		strlcat( strContent, "\\t", MAX_STRING_LENGTH);
+		strcat( strContent, "\\t");
 		BEGIN STR;
 	}
 	YY_BREAK
@@ -1707,7 +1707,7 @@ YY_RULE_SETUP
 #line 347 "lex.l"
 {
 		LIST;
-		strlcat( strContent, "\\", MAX_STRING_LENGTH);
+		strcat( strContent, "\\");
 		BEGIN STR;
 	}
 	YY_BREAK
@@ -1726,8 +1726,8 @@ YY_RULE_SETUP
 #line 356 "lex.l"
 {
 		LIST;
-		strlcat( strContent, "\\", MAX_STRING_LENGTH);
-		strlcat( strContent, yytext, MAX_STRING_LENGTH);
+		strcat( strContent, "\\");
+		strcat( strContent, yytext);
 		BEGIN STR;
 	}
 	YY_BREAK
@@ -1745,22 +1745,21 @@ YY_RULE_SETUP
 #line 367 "lex.l"
 {
 		tokenString("string", strContent);
-		return STRCONTENT
 		BEGIN INITIAL;
-		
+		return STRCONTENT;
 	}
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 373 "lex.l"
+#line 372 "lex.l"
 {
 		LIST;
-		strlcat( strContent, yytext, MAX_STRING_LENGTH);
+		strcat( strContent, yytext);
 	}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 378 "lex.l"
+#line 377 "lex.l"
 {
 		LIST;
         Last_State = INITIAL;
@@ -1770,7 +1769,7 @@ YY_RULE_SETUP
 case 79:
 /* rule 79 can match eol */
 YY_RULE_SETUP
-#line 383 "lex.l"
+#line 382 "lex.l"
 {
 		LIST;
 		if(Last_State == OTHER)Last_State = INITIAL;
@@ -1782,14 +1781,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 393 "lex.l"
+#line 392 "lex.l"
 {
 		LIST;
 	}
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 397 "lex.l"
+#line 396 "lex.l"
 {
 		LIST;
 		BEGIN Last_State;
@@ -1797,7 +1796,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 402 "lex.l"
+#line 401 "lex.l"
 {
 		LIST;
 	}
@@ -1805,7 +1804,7 @@ YY_RULE_SETUP
 case 83:
 /* rule 83 can match eol */
 YY_RULE_SETUP
-#line 406 "lex.l"
+#line 405 "lex.l"
 {
   	      LIST;
   	      if (Opt_Source)
@@ -1816,7 +1815,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 414 "lex.l"
+#line 413 "lex.l"
 {
 		if(Opt_Statistic){
 			set(&id_head,yytext);
@@ -1827,7 +1826,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 422 "lex.l"
+#line 421 "lex.l"
 {
 		//printf("Error at wee line %d: %s\n",linenum, yytext);
                  fprintf(stderr,"Error at line %d: %s\n",linenum, yytext);
@@ -1836,10 +1835,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 427 "lex.l"
+#line 426 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1843 "scanner.c"
+#line 1842 "scanner.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(PRAGMA):
 case YY_STATE_EOF(SOURCE):
@@ -2851,7 +2850,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 427 "lex.l"
+#line 426 "lex.l"
 
 
 

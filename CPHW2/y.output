@@ -82,12 +82,12 @@ Grammar
    40 const_decl: CONST data_type assignments ';'
 
    41 expression: function_call
-   42           | variable
+   42           | STRCONTENT
    43           | INTEGER
    44           | REALNUMBER
    45           | TRUE
    46           | FALSE
-   47           | STRCONTENT
+   47           | variable
 
    48 nonEmptyExpressions: nonEmptyExpressions ',' expression
    49                    | expression
@@ -214,7 +214,7 @@ STRING (282) 18
 CONTINUE (283) 100
 BREAK (284) 99
 RETURN (285) 98
-STRCONTENT (286) 47
+STRCONTENT (286) 42
 ID (287) 11 20 21 34 35 105 106
 
 
@@ -241,7 +241,7 @@ type (58)
 data_type (59)
     on left: 15 16 17 18 19, on right: 14 26 27 40 89
 variable (60)
-    on left: 20 21, on right: 26 27 28 42 80 81 83
+    on left: 20 21, on right: 26 27 28 47 80 81 83
 index (61)
     on left: 22 23, on right: 21 23 35
 argument (62)
@@ -1160,20 +1160,20 @@ State 75
 
 State 76
 
-   47 expression: STRCONTENT .
+   42 expression: STRCONTENT .
 
-    $default  reduce using rule 47 (expression)
+    $default  reduce using rule 42 (expression)
 
 
 State 77
 
-   42 expression: variable .
+   47 expression: variable .
    81 simple: PRINT variable . ';'
 
     ';'  shift, and go to state 115
 
-    ';'       [reduce using rule 42 (expression)]
-    $default  reduce using rule 42 (expression)
+    ';'       [reduce using rule 47 (expression)]
+    $default  reduce using rule 47 (expression)
 
 
 State 78
@@ -1239,9 +1239,9 @@ State 82
 
 State 83
 
-   42 expression: variable .
+   47 expression: variable .
 
-    $default  reduce using rule 42 (expression)
+    $default  reduce using rule 47 (expression)
 
 
 State 84

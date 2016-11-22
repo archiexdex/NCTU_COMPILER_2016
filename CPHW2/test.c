@@ -23,9 +23,6 @@ int main() {
 	if ( a < b ) {
 		int a = 2, w[1];
 		a4(1,2);
-		void a();
-		int b(){
-		}
 	}
 	
 	bool a = a4(1,2) < true == false ;
@@ -37,9 +34,11 @@ int main() {
 		while ( b != e && false );
 	}
 	
-	for ( b[1] = 5; f() && 6 + (5) ;  a = a - 1 ) {
+	for ( b = 5; f() && 6 + (5) ;  a = a - 1 ) {
 		
 	}
+
+	string a = "1" ;
 
 	return 0;
 }
