@@ -1,11 +1,11 @@
 %{
-#include <bsd/string.h>
-#include <y.tab.h>
+#include "y.tab.h"
+#include <string.h>
 
 #define MAX_LINE_LENGTH 257
 #define MAX_ID_LENGTH 257
 #define MAX_STRING_LENGTH 257
-#define LIST                strlcat(buf, yytext, MAX_LINE_LENGTH)
+#define LIST                strcat(buf, yytext)
 #define token(t)            {LIST; if (Opt_Token) printf("<%s>\n", #t);}
 #define tokenInteger(t, i)  {LIST; if (Opt_Token) printf("<%s:%d>\n", t, i);}
 #define tokenString(t, s)   {LIST; if (Opt_Token) printf("<%s:%s>\n", t, s);}
@@ -135,95 +135,95 @@ id *new_id();
 	}
 "("	{
 		tokenString("delim", "(");
-		return LPARENTHESES;
+		return '(';
 	}
 ")"	{
 		tokenString("delim", ")");
-		return RPARENTHESES;
+		return ')';
 	}
 ","	{
 		tokenString("delim", ",");
-		return COMMA;
+		return ',';
 	}
 ";"	{
 		tokenString("delim", ";");
-		return SEMICOLON;
+		return ';';
 	}
 "["	{
 		tokenString("delim", "[");
-		return LSBRACKETS;
+		return '[';
 	}
 "]"	{
 		tokenString("delim", "]");
-		return RSBRACKETS;
+		return ']';
 	}
 "{"	{
 		tokenString("delim", "{");
-		return LBRACKETS;
+		return '{';
 	}
 "}"	{
 		tokenString("delim", "}");
-		return RBRACKETS;
+		return '}';
 	}
 "+"	{
 		token("+");
-		return ADDITION;
+		return '+';
 	}
 "-"	{
 		token("-");
-		return SUBSTRACTION;
+		return '-';
 	}
 "*"	{
 		token("*");
-		return MULTIPLICATION;
+		return '*';
 	}
 "/"	{
 		token("/");
-		return DEVISION;
+		return '/';
 	}
 "%"	{
 		token("%");
-		return DIVISION;
+		return '%';
 	}
 "="	{
 		token("=");
-		return ASSIGNMENT;
+		return '=';
 	}
 "<"	{
 		token("<");
-		return RELATIONAL;
+		return '<';
 	}
 "<="	{
 		token("<=");
-		return RELATIONAL;
+		return LE;
 	}
 "!="	{
 		token("!=");
-		return RELATIONAL;
+		return NQ;
 	}
 ">="	{
 		token(">=");
-		return RELATIONAL;
+		return GE;
 	}
 ">"	{
 		token(">");
-		return RELATIONAL;
+		return '>';
 	}
 "=="	{
 		token("==");
-		return RELATIONAL;
+		return EQ;
 	}
 "&&"	{
 		token("&&");
-		return LOGICAL;
+		return AND;
 	}
 "||"	{
 		token("||");
-		return LOGICAL;
+		return OR;
 	}
 "!"	{
 		token("!");
-		return LOGICAL;
+		return '!';
 	}
 read {
 		tokenString("KW", yytext);
@@ -309,16 +309,16 @@ return	{
 0 |
 [1-9][0-9]* {
 		tokenString("integer", yytext);
-		return NUMBER;
+		return INTEGER;
 	}
 [0-9]+\.[0-9]+	{
 		tokenString("float", yytext);
-		return NUMBER;
+		return REALNUMBER;
 	}
 
 ([0-9]+|([0-9]*\.[0-9]+))([eE][-+]?[0-9]+)	{
 		tokenString("scientific", yytext);
-		return NUMBER;
+		return REALNUMBER;
 	}
 "\""	{ 
 		LIST;
@@ -331,22 +331,22 @@ return	{
 	}
 <STR_ESCAPE>\"	{
 		LIST;
-		strlcat (strContent, "\"", MAX_STRING_LENGTH);
+		strcat (strContent, "\"");
 		BEGIN STR;
 	}
 <STR_ESCAPE>n	{
 		LIST;
-		strlcat( strContent, "\\n", MAX_STRING_LENGTH);
+		strcat( strContent, "\\n");
 		BEGIN STR;
 	}
 <STR_ESCAPE>t	{
 		LIST;
-		strlcat( strContent, "\\t", MAX_STRING_LENGTH);
+		strcat( strContent, "\\t");
 		BEGIN STR;
 	}
 <STR_ESCAPE>\\	{
 		LIST;
-		strlcat( strContent, "\\", MAX_STRING_LENGTH);
+		strcat( strContent, "\\");
 		BEGIN STR;
 	}
 <STR_ESCAPE>\n  {
@@ -355,8 +355,8 @@ return	{
 }
 <STR_ESCAPE>[^\"nt\\]	{
 		LIST;
-		strlcat( strContent, "\\", MAX_STRING_LENGTH);
-		strlcat( strContent, yytext, MAX_STRING_LENGTH);
+		strcat( strContent, "\\");
+		strcat( strContent, yytext);
 		BEGIN STR;
 	}
 <STR>"\n"	{
@@ -366,13 +366,13 @@ return	{
 
 <STR>\"	{
 		tokenString("string", strContent);
-		return STRING;
+		return STRCONTENT;
 		BEGIN INITIAL;
 		
 	}
 <STR>[^\\\n\"]	{
 		LIST;
-		strlcat( strContent, yytext, MAX_STRING_LENGTH);
+		strcat( strContent, yytext);
 	}
 
 "/*"	{
@@ -426,7 +426,7 @@ return	{
 	}
 %%
 
-int main( int argc, char **argv )
+int lex_main( int argc, char **argv )
 {
 
 	if( argc == 1 )

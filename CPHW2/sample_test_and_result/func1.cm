@@ -1,0 +1,19 @@
+#pragma source on
+#pragma token on
+#pragma statistic on
+void func1();
+
+int a;
+
+int fun()
+{
+    return 0;
+}
+
+int d;
+
+void func1()
+{
+    int b;
+}
+
