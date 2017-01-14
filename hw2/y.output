@@ -1,0 +1,3128 @@
+Terminals unused in grammar
+
+   BOOLEAN
+
+
+Rules useless in parser due to conflicts
+
+  101 initexpr: %empty
+
+  106 increxpr: %empty
+
+
+State 75 conflicts: 1 reduce/reduce
+State 84 conflicts: 1 shift/reduce
+State 194 conflicts: 1 reduce/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: program_body
+
+    2 program_body: declaration_list
+
+    3 declaration_list: nonEmptyDeclarationList
+    4                 | %empty
+
+    5 nonEmptyDeclarationList: nonEmptyDeclarationList decl
+    6                        | decl
+
+    7 decl: func_decl
+    8     | var_decl
+    9     | const_decl
+
+   10 func_decl: func_set ';'
+   11          | func_set compound
+
+   12 func_set: type ID '(' argument ')'
+
+   13 var_decl: type variables ';'
+
+   14 type: VOID
+   15     | data_type
+
+   16 data_type: INT
+   17          | DOUBLE
+   18          | FLOAT
+   19          | STRING
+   20          | BOOL
+
+   21 variable: ID
+   22         | ID index
+
+   23 index: '[' expressions ']'
+   24      | index '[' expressions ']'
+
+   25 argument: nonEmptyArgument
+   26         | %empty
+
+   27 nonEmptyArgument: nonEmptyArgument ',' data_type variable
+   28                 | data_type variable
+
+   29 var_list: variable
+   30         | init_var
+
+   31 variables: nonEmptyVariables
+   32          | %empty
+
+   33 nonEmptyVariables: nonEmptyVariables ',' var_list
+   34                  | var_list
+
+   35 init_var: ID '=' expressions
+   36         | ID index '=' '{' nonEmptyExpressions '}'
+
+   37 initVars: nonEmptyInitVars
+   38         | %empty
+
+   39 nonEmptyInitVars: nonEmptyInitVars ',' init_var
+   40                 | init_var
+
+   41 const_decl: CONST data_type initVars ';'
+
+   42 expression: func_invoke
+   43           | STRCONTENT
+   44           | INTEGER
+   45           | REALNUMBER
+   46           | TRUE
+   47           | FALSE
+   48           | variable
+
+   49 nonEmptyExpressions: nonEmptyExpressions ',' expression
+   50                    | expression
+
+   51 expressions: '-' expressions
+   52            | expressions '+' expressions
+   53            | expressions '-' expressions
+   54            | expressions '*' expressions
+   55            | expressions '/' expressions
+   56            | expressions '%' expressions
+   57            | expressions '<' expressions
+   58            | expressions LE expressions
+   59            | expressions EQ expressions
+   60            | expressions GE expressions
+   61            | expressions '>' expressions
+   62            | expressions NQ expressions
+   63            | expressions AND expressions
+   64            | expressions OR expressions
+   65            | '!' expressions
+   66            | '(' expressions ')'
+   67            | expression
+
+   68 state_list: compound
+   69           | condition
+   70           | simple
+   71           | while
+   72           | for
+   73           | jump
+   74           | function_call
+
+   75 list: state_list
+   76     | var_decl
+   77     | const_decl
+
+   78 lists: nonEmptyLists
+   79      | %empty
+
+   80 nonEmptyLists: nonEmptyLists list
+   81              | list
+
+   82 compound: '{' lists '}'
+
+   83 simple: variable '=' expressions ';'
+   84       | PRINT variable ';'
+   85       | PRINT expressions ';'
+   86       | READ variable ';'
+
+   87 condition: IF '(' expressions ')' compound
+   88          | IF '(' expressions ')' ELSE compound
+
+   89 while: WHILE '(' expressions ')' compound
+   90      | DO compound WHILE '(' expressions ')' ';'
+
+   91 for: FOR '(' initexpr ';' ctrexpr ';' increxpr ')' compound
+
+   92 assignment: ID '=' expressions
+   93           | ID index '=' expressions
+
+   94 assignments: nonEmptyAssignments
+   95            | %empty
+
+   96 nonEmptyAssignments: nonEmptyAssignments ',' assignment
+   97                    | assignment
+
+   98 initexpr: data_type assignments
+   99         | assignments
+  100         | func_invoke
+  101         | %empty
+
+  102 ctrexpr: expressions
+  103        | %empty
+
+  104 increxpr: assignments
+  105         | func_invoke
+  106         | %empty
+
+  107 jump: RETURN expressions ';'
+  108     | BREAK ';'
+  109     | CONTINUE ';'
+
+  110 expressionList: nonEmptyExpressionList
+  111               | %empty
+
+  112 nonEmptyExpressionList: nonEmptyExpressionList ',' expressions
+  113                       | expressions
+
+  114 func_invoke: ID '(' expressionList ')'
+
+  115 function_call: func_invoke ';'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 65
+'%' (37) 56
+'(' (40) 12 66 87 88 89 90 91 114
+')' (41) 12 66 87 88 89 90 91 114
+'*' (42) 54
+'+' (43) 52
+',' (44) 27 33 39 49 96 112
+'-' (45) 51 53
+'/' (47) 55
+';' (59) 10 13 41 83 84 85 86 90 91 107 108 109 115
+'<' (60) 57
+'=' (61) 35 36 83 92 93
+'>' (62) 61
+'[' (91) 23 24
+']' (93) 23 24
+'{' (123) 36 82
+'}' (125) 36 82
+error (256)
+LE (258) 58
+EQ (259) 59
+GE (260) 60
+NQ (261) 62
+AND (262) 63
+OR (263) 64
+INTEGER (264) 44
+REALNUMBER (265) 45
+READ (266) 86
+BOOLEAN (267)
+WHILE (268) 89 90
+DO (269) 90
+IF (270) 87 88
+ELSE (271) 88
+TRUE (272) 46
+FALSE (273) 47
+FOR (274) 91
+CONST (275) 41
+INT (276) 16
+PRINT (277) 84 85
+BOOL (278) 20
+VOID (279) 14
+FLOAT (280) 18
+DOUBLE (281) 17
+STRING (282) 19
+CONTINUE (283) 109
+BREAK (284) 108
+RETURN (285) 107
+STRCONTENT (286) 43
+ID (287) 12 21 22 35 36 92 93 114
+
+
+Nonterminals, with rules where they appear
+
+$accept (50)
+    on left: 0
+program (51)
+    on left: 1, on right: 0
+program_body (52)
+    on left: 2, on right: 1
+declaration_list (53)
+    on left: 3 4, on right: 2
+nonEmptyDeclarationList (54)
+    on left: 5 6, on right: 3 5
+decl (55)
+    on left: 7 8 9, on right: 5 6
+func_decl (56)
+    on left: 10 11, on right: 7
+func_set (57)
+    on left: 12, on right: 10 11
+var_decl (58)
+    on left: 13, on right: 8 76
+type (59)
+    on left: 14 15, on right: 12 13
+data_type (60)
+    on left: 16 17 18 19 20, on right: 15 27 28 41 98
+variable (61)
+    on left: 21 22, on right: 27 28 29 48 83 84 86
+index (62)
+    on left: 23 24, on right: 22 24 36 93
+argument (63)
+    on left: 25 26, on right: 12
+nonEmptyArgument (64)
+    on left: 27 28, on right: 25 27
+var_list (65)
+    on left: 29 30, on right: 33 34
+variables (66)
+    on left: 31 32, on right: 13
+nonEmptyVariables (67)
+    on left: 33 34, on right: 31 33
+init_var (68)
+    on left: 35 36, on right: 30 39 40
+initVars (69)
+    on left: 37 38, on right: 41
+nonEmptyInitVars (70)
+    on left: 39 40, on right: 37 39
+const_decl (71)
+    on left: 41, on right: 9 77
+expression (72)
+    on left: 42 43 44 45 46 47 48, on right: 49 50 67
+nonEmptyExpressions (73)
+    on left: 49 50, on right: 36 49
+expressions (74)
+    on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67, on right:
+    23 24 35 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 83 85
+    87 88 89 90 92 93 102 107 112 113
+state_list (75)
+    on left: 68 69 70 71 72 73 74, on right: 75
+list (76)
+    on left: 75 76 77, on right: 80 81
+lists (77)
+    on left: 78 79, on right: 82
+nonEmptyLists (78)
+    on left: 80 81, on right: 78 80
+compound (79)
+    on left: 82, on right: 11 68 87 88 89 90 91
+simple (80)
+    on left: 83 84 85 86, on right: 70
+condition (81)
+    on left: 87 88, on right: 69
+while (82)
+    on left: 89 90, on right: 71
+for (83)
+    on left: 91, on right: 72
+assignment (84)
+    on left: 92 93, on right: 96 97
+assignments (85)
+    on left: 94 95, on right: 98 99 104
+nonEmptyAssignments (86)
+    on left: 96 97, on right: 94 96
+initexpr (87)
+    on left: 98 99 100 101, on right: 91
+ctrexpr (88)
+    on left: 102 103, on right: 91
+increxpr (89)
+    on left: 104 105 106, on right: 91
+jump (90)
+    on left: 107 108 109, on right: 73
+expressionList (91)
+    on left: 110 111, on right: 114
+nonEmptyExpressionList (92)
+    on left: 112 113, on right: 110 112
+func_invoke (93)
+    on left: 114, on right: 42 100 105 115
+function_call (94)
+    on left: 115, on right: 74
+
+
+State 0
+
+    0 $accept: . program $end
+
+    CONST   shift, and go to state 1
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    VOID    shift, and go to state 4
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    $default  reduce using rule 4 (declaration_list)
+
+    program                  go to state 8
+    program_body             go to state 9
+    declaration_list         go to state 10
+    nonEmptyDeclarationList  go to state 11
+    decl                     go to state 12
+    func_decl                go to state 13
+    func_set                 go to state 14
+    var_decl                 go to state 15
+    type                     go to state 16
+    data_type                go to state 17
+    const_decl               go to state 18
+
+
+State 1
+
+   41 const_decl: CONST . data_type initVars ';'
+
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    data_type  go to state 19
+
+
+State 2
+
+   16 data_type: INT .
+
+    $default  reduce using rule 16 (data_type)
+
+
+State 3
+
+   20 data_type: BOOL .
+
+    $default  reduce using rule 20 (data_type)
+
+
+State 4
+
+   14 type: VOID .
+
+    $default  reduce using rule 14 (type)
+
+
+State 5
+
+   18 data_type: FLOAT .
+
+    $default  reduce using rule 18 (data_type)
+
+
+State 6
+
+   17 data_type: DOUBLE .
+
+    $default  reduce using rule 17 (data_type)
+
+
+State 7
+
+   19 data_type: STRING .
+
+    $default  reduce using rule 19 (data_type)
+
+
+State 8
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 20
+
+
+State 9
+
+    1 program: program_body .
+
+    $default  reduce using rule 1 (program)
+
+
+State 10
+
+    2 program_body: declaration_list .
+
+    $default  reduce using rule 2 (program_body)
+
+
+State 11
+
+    3 declaration_list: nonEmptyDeclarationList .
+    5 nonEmptyDeclarationList: nonEmptyDeclarationList . decl
+
+    CONST   shift, and go to state 1
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    VOID    shift, and go to state 4
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    $default  reduce using rule 3 (declaration_list)
+
+    decl        go to state 21
+    func_decl   go to state 13
+    func_set    go to state 14
+    var_decl    go to state 15
+    type        go to state 16
+    data_type   go to state 17
+    const_decl  go to state 18
+
+
+State 12
+
+    6 nonEmptyDeclarationList: decl .
+
+    $default  reduce using rule 6 (nonEmptyDeclarationList)
+
+
+State 13
+
+    7 decl: func_decl .
+
+    $default  reduce using rule 7 (decl)
+
+
+State 14
+
+   10 func_decl: func_set . ';'
+   11          | func_set . compound
+
+    ';'  shift, and go to state 22
+    '{'  shift, and go to state 23
+
+    compound  go to state 24
+
+
+State 15
+
+    8 decl: var_decl .
+
+    $default  reduce using rule 8 (decl)
+
+
+State 16
+
+   12 func_set: type . ID '(' argument ')'
+   13 var_decl: type . variables ';'
+
+    ID  shift, and go to state 25
+
+    $default  reduce using rule 32 (variables)
+
+    variable           go to state 26
+    var_list           go to state 27
+    variables          go to state 28
+    nonEmptyVariables  go to state 29
+    init_var           go to state 30
+
+
+State 17
+
+   15 type: data_type .
+
+    $default  reduce using rule 15 (type)
+
+
+State 18
+
+    9 decl: const_decl .
+
+    $default  reduce using rule 9 (decl)
+
+
+State 19
+
+   41 const_decl: CONST data_type . initVars ';'
+
+    ID  shift, and go to state 31
+
+    $default  reduce using rule 38 (initVars)
+
+    init_var          go to state 32
+    initVars          go to state 33
+    nonEmptyInitVars  go to state 34
+
+
+State 20
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 21
+
+    5 nonEmptyDeclarationList: nonEmptyDeclarationList decl .
+
+    $default  reduce using rule 5 (nonEmptyDeclarationList)
+
+
+State 22
+
+   10 func_decl: func_set ';' .
+
+    $default  reduce using rule 10 (func_decl)
+
+
+State 23
+
+   82 compound: '{' . lists '}'
+
+    '{'       shift, and go to state 23
+    READ      shift, and go to state 35
+    WHILE     shift, and go to state 36
+    DO        shift, and go to state 37
+    IF        shift, and go to state 38
+    FOR       shift, and go to state 39
+    CONST     shift, and go to state 1
+    INT       shift, and go to state 2
+    PRINT     shift, and go to state 40
+    BOOL      shift, and go to state 3
+    VOID      shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    DOUBLE    shift, and go to state 6
+    STRING    shift, and go to state 7
+    CONTINUE  shift, and go to state 41
+    BREAK     shift, and go to state 42
+    RETURN    shift, and go to state 43
+    ID        shift, and go to state 44
+
+    $default  reduce using rule 79 (lists)
+
+    var_decl       go to state 45
+    type           go to state 46
+    data_type      go to state 17
+    variable       go to state 47
+    const_decl     go to state 48
+    state_list     go to state 49
+    list           go to state 50
+    lists          go to state 51
+    nonEmptyLists  go to state 52
+    compound       go to state 53
+    simple         go to state 54
+    condition      go to state 55
+    while          go to state 56
+    for            go to state 57
+    jump           go to state 58
+    func_invoke    go to state 59
+    function_call  go to state 60
+
+
+State 24
+
+   11 func_decl: func_set compound .
+
+    $default  reduce using rule 11 (func_decl)
+
+
+State 25
+
+   12 func_set: type ID . '(' argument ')'
+   21 variable: ID .
+   22         | ID . index
+   35 init_var: ID . '=' expressions
+   36         | ID . index '=' '{' nonEmptyExpressions '}'
+
+    '('  shift, and go to state 61
+    '['  shift, and go to state 62
+    '='  shift, and go to state 63
+
+    $default  reduce using rule 21 (variable)
+
+    index  go to state 64
+
+
+State 26
+
+   29 var_list: variable .
+
+    $default  reduce using rule 29 (var_list)
+
+
+State 27
+
+   34 nonEmptyVariables: var_list .
+
+    $default  reduce using rule 34 (nonEmptyVariables)
+
+
+State 28
+
+   13 var_decl: type variables . ';'
+
+    ';'  shift, and go to state 65
+
+
+State 29
+
+   31 variables: nonEmptyVariables .
+   33 nonEmptyVariables: nonEmptyVariables . ',' var_list
+
+    ','  shift, and go to state 66
+
+    $default  reduce using rule 31 (variables)
+
+
+State 30
+
+   30 var_list: init_var .
+
+    $default  reduce using rule 30 (var_list)
+
+
+State 31
+
+   35 init_var: ID . '=' expressions
+   36         | ID . index '=' '{' nonEmptyExpressions '}'
+
+    '['  shift, and go to state 62
+    '='  shift, and go to state 63
+
+    index  go to state 67
+
+
+State 32
+
+   40 nonEmptyInitVars: init_var .
+
+    $default  reduce using rule 40 (nonEmptyInitVars)
+
+
+State 33
+
+   41 const_decl: CONST data_type initVars . ';'
+
+    ';'  shift, and go to state 68
+
+
+State 34
+
+   37 initVars: nonEmptyInitVars .
+   39 nonEmptyInitVars: nonEmptyInitVars . ',' init_var
+
+    ','  shift, and go to state 69
+
+    $default  reduce using rule 37 (initVars)
+
+
+State 35
+
+   86 simple: READ . variable ';'
+
+    ID  shift, and go to state 70
+
+    variable  go to state 71
+
+
+State 36
+
+   89 while: WHILE . '(' expressions ')' compound
+
+    '('  shift, and go to state 72
+
+
+State 37
+
+   90 while: DO . compound WHILE '(' expressions ')' ';'
+
+    '{'  shift, and go to state 23
+
+    compound  go to state 73
+
+
+State 38
+
+   87 condition: IF . '(' expressions ')' compound
+   88          | IF . '(' expressions ')' ELSE compound
+
+    '('  shift, and go to state 74
+
+
+State 39
+
+   91 for: FOR . '(' initexpr ';' ctrexpr ';' increxpr ')' compound
+
+    '('  shift, and go to state 75
+
+
+State 40
+
+   84 simple: PRINT . variable ';'
+   85       | PRINT . expressions ';'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 84
+    expression   go to state 85
+    expressions  go to state 86
+    func_invoke  go to state 87
+
+
+State 41
+
+  109 jump: CONTINUE . ';'
+
+    ';'  shift, and go to state 88
+
+
+State 42
+
+  108 jump: BREAK . ';'
+
+    ';'  shift, and go to state 89
+
+
+State 43
+
+  107 jump: RETURN . expressions ';'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 91
+    func_invoke  go to state 87
+
+
+State 44
+
+   21 variable: ID .
+   22         | ID . index
+  114 func_invoke: ID . '(' expressionList ')'
+
+    '('  shift, and go to state 92
+    '['  shift, and go to state 62
+
+    $default  reduce using rule 21 (variable)
+
+    index  go to state 93
+
+
+State 45
+
+   76 list: var_decl .
+
+    $default  reduce using rule 76 (list)
+
+
+State 46
+
+   13 var_decl: type . variables ';'
+
+    ID  shift, and go to state 94
+
+    $default  reduce using rule 32 (variables)
+
+    variable           go to state 26
+    var_list           go to state 27
+    variables          go to state 28
+    nonEmptyVariables  go to state 29
+    init_var           go to state 30
+
+
+State 47
+
+   83 simple: variable . '=' expressions ';'
+
+    '='  shift, and go to state 95
+
+
+State 48
+
+   77 list: const_decl .
+
+    $default  reduce using rule 77 (list)
+
+
+State 49
+
+   75 list: state_list .
+
+    $default  reduce using rule 75 (list)
+
+
+State 50
+
+   81 nonEmptyLists: list .
+
+    $default  reduce using rule 81 (nonEmptyLists)
+
+
+State 51
+
+   82 compound: '{' lists . '}'
+
+    '}'  shift, and go to state 96
+
+
+State 52
+
+   78 lists: nonEmptyLists .
+   80 nonEmptyLists: nonEmptyLists . list
+
+    '{'       shift, and go to state 23
+    READ      shift, and go to state 35
+    WHILE     shift, and go to state 36
+    DO        shift, and go to state 37
+    IF        shift, and go to state 38
+    FOR       shift, and go to state 39
+    CONST     shift, and go to state 1
+    INT       shift, and go to state 2
+    PRINT     shift, and go to state 40
+    BOOL      shift, and go to state 3
+    VOID      shift, and go to state 4
+    FLOAT     shift, and go to state 5
+    DOUBLE    shift, and go to state 6
+    STRING    shift, and go to state 7
+    CONTINUE  shift, and go to state 41
+    BREAK     shift, and go to state 42
+    RETURN    shift, and go to state 43
+    ID        shift, and go to state 44
+
+    $default  reduce using rule 78 (lists)
+
+    var_decl       go to state 45
+    type           go to state 46
+    data_type      go to state 17
+    variable       go to state 47
+    const_decl     go to state 48
+    state_list     go to state 49
+    list           go to state 97
+    compound       go to state 53
+    simple         go to state 54
+    condition      go to state 55
+    while          go to state 56
+    for            go to state 57
+    jump           go to state 58
+    func_invoke    go to state 59
+    function_call  go to state 60
+
+
+State 53
+
+   68 state_list: compound .
+
+    $default  reduce using rule 68 (state_list)
+
+
+State 54
+
+   70 state_list: simple .
+
+    $default  reduce using rule 70 (state_list)
+
+
+State 55
+
+   69 state_list: condition .
+
+    $default  reduce using rule 69 (state_list)
+
+
+State 56
+
+   71 state_list: while .
+
+    $default  reduce using rule 71 (state_list)
+
+
+State 57
+
+   72 state_list: for .
+
+    $default  reduce using rule 72 (state_list)
+
+
+State 58
+
+   73 state_list: jump .
+
+    $default  reduce using rule 73 (state_list)
+
+
+State 59
+
+  115 function_call: func_invoke . ';'
+
+    ';'  shift, and go to state 98
+
+
+State 60
+
+   74 state_list: function_call .
+
+    $default  reduce using rule 74 (state_list)
+
+
+State 61
+
+   12 func_set: type ID '(' . argument ')'
+
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    $default  reduce using rule 26 (argument)
+
+    data_type         go to state 99
+    argument          go to state 100
+    nonEmptyArgument  go to state 101
+
+
+State 62
+
+   23 index: '[' . expressions ']'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 102
+    func_invoke  go to state 87
+
+
+State 63
+
+   35 init_var: ID '=' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 103
+    func_invoke  go to state 87
+
+
+State 64
+
+   22 variable: ID index .
+   24 index: index . '[' expressions ']'
+   36 init_var: ID index . '=' '{' nonEmptyExpressions '}'
+
+    '['  shift, and go to state 104
+    '='  shift, and go to state 105
+
+    $default  reduce using rule 22 (variable)
+
+
+State 65
+
+   13 var_decl: type variables ';' .
+
+    $default  reduce using rule 13 (var_decl)
+
+
+State 66
+
+   33 nonEmptyVariables: nonEmptyVariables ',' . var_list
+
+    ID  shift, and go to state 94
+
+    variable  go to state 26
+    var_list  go to state 106
+    init_var  go to state 30
+
+
+State 67
+
+   24 index: index . '[' expressions ']'
+   36 init_var: ID index . '=' '{' nonEmptyExpressions '}'
+
+    '['  shift, and go to state 104
+    '='  shift, and go to state 105
+
+
+State 68
+
+   41 const_decl: CONST data_type initVars ';' .
+
+    $default  reduce using rule 41 (const_decl)
+
+
+State 69
+
+   39 nonEmptyInitVars: nonEmptyInitVars ',' . init_var
+
+    ID  shift, and go to state 31
+
+    init_var  go to state 107
+
+
+State 70
+
+   21 variable: ID .
+   22         | ID . index
+
+    '['  shift, and go to state 62
+
+    $default  reduce using rule 21 (variable)
+
+    index  go to state 93
+
+
+State 71
+
+   86 simple: READ variable . ';'
+
+    ';'  shift, and go to state 108
+
+
+State 72
+
+   89 while: WHILE '(' . expressions ')' compound
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 109
+    func_invoke  go to state 87
+
+
+State 73
+
+   90 while: DO compound . WHILE '(' expressions ')' ';'
+
+    WHILE  shift, and go to state 110
+
+
+State 74
+
+   87 condition: IF '(' . expressions ')' compound
+   88          | IF '(' . expressions ')' ELSE compound
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 111
+    func_invoke  go to state 87
+
+
+State 75
+
+   91 for: FOR '(' . initexpr ';' ctrexpr ';' increxpr ')' compound
+
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+    ID      shift, and go to state 112
+
+    ';'       reduce using rule 95 (assignments)
+    ';'       [reduce using rule 101 (initexpr)]
+    $default  reduce using rule 95 (assignments)
+
+    data_type            go to state 113
+    assignment           go to state 114
+    assignments          go to state 115
+    nonEmptyAssignments  go to state 116
+    initexpr             go to state 117
+    func_invoke          go to state 118
+
+
+State 76
+
+   66 expressions: '(' . expressions ')'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 119
+    func_invoke  go to state 87
+
+
+State 77
+
+   51 expressions: '-' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 120
+    func_invoke  go to state 87
+
+
+State 78
+
+   65 expressions: '!' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 121
+    func_invoke  go to state 87
+
+
+State 79
+
+   44 expression: INTEGER .
+
+    $default  reduce using rule 44 (expression)
+
+
+State 80
+
+   45 expression: REALNUMBER .
+
+    $default  reduce using rule 45 (expression)
+
+
+State 81
+
+   46 expression: TRUE .
+
+    $default  reduce using rule 46 (expression)
+
+
+State 82
+
+   47 expression: FALSE .
+
+    $default  reduce using rule 47 (expression)
+
+
+State 83
+
+   43 expression: STRCONTENT .
+
+    $default  reduce using rule 43 (expression)
+
+
+State 84
+
+   48 expression: variable .
+   84 simple: PRINT variable . ';'
+
+    ';'  shift, and go to state 122
+
+    ';'       [reduce using rule 48 (expression)]
+    $default  reduce using rule 48 (expression)
+
+
+State 85
+
+   67 expressions: expression .
+
+    $default  reduce using rule 67 (expressions)
+
+
+State 86
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   85 simple: PRINT expressions . ';'
+
+    ';'  shift, and go to state 123
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 87
+
+   42 expression: func_invoke .
+
+    $default  reduce using rule 42 (expression)
+
+
+State 88
+
+  109 jump: CONTINUE ';' .
+
+    $default  reduce using rule 109 (jump)
+
+
+State 89
+
+  108 jump: BREAK ';' .
+
+    $default  reduce using rule 108 (jump)
+
+
+State 90
+
+   48 expression: variable .
+
+    $default  reduce using rule 48 (expression)
+
+
+State 91
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+  107 jump: RETURN expressions . ';'
+
+    ';'  shift, and go to state 137
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 92
+
+  114 func_invoke: ID '(' . expressionList ')'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    $default  reduce using rule 111 (expressionList)
+
+    variable                go to state 90
+    expression              go to state 85
+    expressions             go to state 138
+    expressionList          go to state 139
+    nonEmptyExpressionList  go to state 140
+    func_invoke             go to state 87
+
+
+State 93
+
+   22 variable: ID index .
+   24 index: index . '[' expressions ']'
+
+    '['  shift, and go to state 104
+
+    $default  reduce using rule 22 (variable)
+
+
+State 94
+
+   21 variable: ID .
+   22         | ID . index
+   35 init_var: ID . '=' expressions
+   36         | ID . index '=' '{' nonEmptyExpressions '}'
+
+    '['  shift, and go to state 62
+    '='  shift, and go to state 63
+
+    $default  reduce using rule 21 (variable)
+
+    index  go to state 64
+
+
+State 95
+
+   83 simple: variable '=' . expressions ';'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 141
+    func_invoke  go to state 87
+
+
+State 96
+
+   82 compound: '{' lists '}' .
+
+    $default  reduce using rule 82 (compound)
+
+
+State 97
+
+   80 nonEmptyLists: nonEmptyLists list .
+
+    $default  reduce using rule 80 (nonEmptyLists)
+
+
+State 98
+
+  115 function_call: func_invoke ';' .
+
+    $default  reduce using rule 115 (function_call)
+
+
+State 99
+
+   28 nonEmptyArgument: data_type . variable
+
+    ID  shift, and go to state 70
+
+    variable  go to state 142
+
+
+State 100
+
+   12 func_set: type ID '(' argument . ')'
+
+    ')'  shift, and go to state 143
+
+
+State 101
+
+   25 argument: nonEmptyArgument .
+   27 nonEmptyArgument: nonEmptyArgument . ',' data_type variable
+
+    ','  shift, and go to state 144
+
+    $default  reduce using rule 25 (argument)
+
+
+State 102
+
+   23 index: '[' expressions . ']'
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    ']'  shift, and go to state 145
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 103
+
+   35 init_var: ID '=' expressions .
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 35 (init_var)
+
+
+State 104
+
+   24 index: index '[' . expressions ']'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 146
+    func_invoke  go to state 87
+
+
+State 105
+
+   36 init_var: ID index '=' . '{' nonEmptyExpressions '}'
+
+    '{'  shift, and go to state 147
+
+
+State 106
+
+   33 nonEmptyVariables: nonEmptyVariables ',' var_list .
+
+    $default  reduce using rule 33 (nonEmptyVariables)
+
+
+State 107
+
+   39 nonEmptyInitVars: nonEmptyInitVars ',' init_var .
+
+    $default  reduce using rule 39 (nonEmptyInitVars)
+
+
+State 108
+
+   86 simple: READ variable ';' .
+
+    $default  reduce using rule 86 (simple)
+
+
+State 109
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   89 while: WHILE '(' expressions . ')' compound
+
+    ')'  shift, and go to state 148
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 110
+
+   90 while: DO compound WHILE . '(' expressions ')' ';'
+
+    '('  shift, and go to state 149
+
+
+State 111
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   87 condition: IF '(' expressions . ')' compound
+   88          | IF '(' expressions . ')' ELSE compound
+
+    ')'  shift, and go to state 150
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 112
+
+   92 assignment: ID . '=' expressions
+   93           | ID . index '=' expressions
+  114 func_invoke: ID . '(' expressionList ')'
+
+    '('  shift, and go to state 92
+    '['  shift, and go to state 62
+    '='  shift, and go to state 151
+
+    index  go to state 152
+
+
+State 113
+
+   98 initexpr: data_type . assignments
+
+    ID  shift, and go to state 153
+
+    $default  reduce using rule 95 (assignments)
+
+    assignment           go to state 114
+    assignments          go to state 154
+    nonEmptyAssignments  go to state 116
+
+
+State 114
+
+   97 nonEmptyAssignments: assignment .
+
+    $default  reduce using rule 97 (nonEmptyAssignments)
+
+
+State 115
+
+   99 initexpr: assignments .
+
+    $default  reduce using rule 99 (initexpr)
+
+
+State 116
+
+   94 assignments: nonEmptyAssignments .
+   96 nonEmptyAssignments: nonEmptyAssignments . ',' assignment
+
+    ','  shift, and go to state 155
+
+    $default  reduce using rule 94 (assignments)
+
+
+State 117
+
+   91 for: FOR '(' initexpr . ';' ctrexpr ';' increxpr ')' compound
+
+    ';'  shift, and go to state 156
+
+
+State 118
+
+  100 initexpr: func_invoke .
+
+    $default  reduce using rule 100 (initexpr)
+
+
+State 119
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   66            | '(' expressions . ')'
+
+    ')'  shift, and go to state 157
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 120
+
+   51 expressions: '-' expressions .
+   52            | expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    $default  reduce using rule 51 (expressions)
+
+
+State 121
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   65            | '!' expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+
+    $default  reduce using rule 65 (expressions)
+
+
+State 122
+
+   84 simple: PRINT variable ';' .
+
+    $default  reduce using rule 84 (simple)
+
+
+State 123
+
+   85 simple: PRINT expressions ';' .
+
+    $default  reduce using rule 85 (simple)
+
+
+State 124
+
+   52 expressions: expressions '+' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 158
+    func_invoke  go to state 87
+
+
+State 125
+
+   53 expressions: expressions '-' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 159
+    func_invoke  go to state 87
+
+
+State 126
+
+   54 expressions: expressions '*' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 160
+    func_invoke  go to state 87
+
+
+State 127
+
+   55 expressions: expressions '/' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 161
+    func_invoke  go to state 87
+
+
+State 128
+
+   56 expressions: expressions '%' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 162
+    func_invoke  go to state 87
+
+
+State 129
+
+   57 expressions: expressions '<' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 163
+    func_invoke  go to state 87
+
+
+State 130
+
+   58 expressions: expressions LE . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 164
+    func_invoke  go to state 87
+
+
+State 131
+
+   59 expressions: expressions EQ . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 165
+    func_invoke  go to state 87
+
+
+State 132
+
+   60 expressions: expressions GE . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 166
+    func_invoke  go to state 87
+
+
+State 133
+
+   61 expressions: expressions '>' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 167
+    func_invoke  go to state 87
+
+
+State 134
+
+   62 expressions: expressions NQ . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 168
+    func_invoke  go to state 87
+
+
+State 135
+
+   63 expressions: expressions AND . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 169
+    func_invoke  go to state 87
+
+
+State 136
+
+   64 expressions: expressions OR . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 170
+    func_invoke  go to state 87
+
+
+State 137
+
+  107 jump: RETURN expressions ';' .
+
+    $default  reduce using rule 107 (jump)
+
+
+State 138
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+  113 nonEmptyExpressionList: expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 113 (nonEmptyExpressionList)
+
+
+State 139
+
+  114 func_invoke: ID '(' expressionList . ')'
+
+    ')'  shift, and go to state 171
+
+
+State 140
+
+  110 expressionList: nonEmptyExpressionList .
+  112 nonEmptyExpressionList: nonEmptyExpressionList . ',' expressions
+
+    ','  shift, and go to state 172
+
+    $default  reduce using rule 110 (expressionList)
+
+
+State 141
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   83 simple: variable '=' expressions . ';'
+
+    ';'  shift, and go to state 173
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 142
+
+   28 nonEmptyArgument: data_type variable .
+
+    $default  reduce using rule 28 (nonEmptyArgument)
+
+
+State 143
+
+   12 func_set: type ID '(' argument ')' .
+
+    $default  reduce using rule 12 (func_set)
+
+
+State 144
+
+   27 nonEmptyArgument: nonEmptyArgument ',' . data_type variable
+
+    INT     shift, and go to state 2
+    BOOL    shift, and go to state 3
+    FLOAT   shift, and go to state 5
+    DOUBLE  shift, and go to state 6
+    STRING  shift, and go to state 7
+
+    data_type  go to state 174
+
+
+State 145
+
+   23 index: '[' expressions ']' .
+
+    $default  reduce using rule 23 (index)
+
+
+State 146
+
+   24 index: index '[' expressions . ']'
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    ']'  shift, and go to state 175
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 147
+
+   36 init_var: ID index '=' '{' . nonEmptyExpressions '}'
+
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable             go to state 90
+    expression           go to state 176
+    nonEmptyExpressions  go to state 177
+    func_invoke          go to state 87
+
+
+State 148
+
+   89 while: WHILE '(' expressions ')' . compound
+
+    '{'  shift, and go to state 23
+
+    compound  go to state 178
+
+
+State 149
+
+   90 while: DO compound WHILE '(' . expressions ')' ';'
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 179
+    func_invoke  go to state 87
+
+
+State 150
+
+   87 condition: IF '(' expressions ')' . compound
+   88          | IF '(' expressions ')' . ELSE compound
+
+    '{'   shift, and go to state 23
+    ELSE  shift, and go to state 180
+
+    compound  go to state 181
+
+
+State 151
+
+   92 assignment: ID '=' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 182
+    func_invoke  go to state 87
+
+
+State 152
+
+   24 index: index . '[' expressions ']'
+   93 assignment: ID index . '=' expressions
+
+    '['  shift, and go to state 104
+    '='  shift, and go to state 183
+
+
+State 153
+
+   92 assignment: ID . '=' expressions
+   93           | ID . index '=' expressions
+
+    '['  shift, and go to state 62
+    '='  shift, and go to state 151
+
+    index  go to state 152
+
+
+State 154
+
+   98 initexpr: data_type assignments .
+
+    $default  reduce using rule 98 (initexpr)
+
+
+State 155
+
+   96 nonEmptyAssignments: nonEmptyAssignments ',' . assignment
+
+    ID  shift, and go to state 153
+
+    assignment  go to state 184
+
+
+State 156
+
+   91 for: FOR '(' initexpr ';' . ctrexpr ';' increxpr ')' compound
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    $default  reduce using rule 103 (ctrexpr)
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 185
+    ctrexpr      go to state 186
+    func_invoke  go to state 87
+
+
+State 157
+
+   66 expressions: '(' expressions ')' .
+
+    $default  reduce using rule 66 (expressions)
+
+
+State 158
+
+   52 expressions: expressions . '+' expressions
+   52            | expressions '+' expressions .
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 52 (expressions)
+
+
+State 159
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   53            | expressions '-' expressions .
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 53 (expressions)
+
+
+State 160
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   54            | expressions '*' expressions .
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    $default  reduce using rule 54 (expressions)
+
+
+State 161
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   55            | expressions '/' expressions .
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    $default  reduce using rule 55 (expressions)
+
+
+State 162
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   56            | expressions '%' expressions .
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    $default  reduce using rule 56 (expressions)
+
+
+State 163
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   57            | expressions '<' expressions .
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 57 (expressions)
+
+
+State 164
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   58            | expressions LE expressions .
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 58 (expressions)
+
+
+State 165
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   59            | expressions EQ expressions .
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 59 (expressions)
+
+
+State 166
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   60            | expressions GE expressions .
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 60 (expressions)
+
+
+State 167
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   61            | expressions '>' expressions .
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 61 (expressions)
+
+
+State 168
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   62            | expressions NQ expressions .
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+
+    $default  reduce using rule 62 (expressions)
+
+
+State 169
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   63            | expressions AND expressions .
+   64            | expressions . OR expressions
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+
+    $default  reduce using rule 63 (expressions)
+
+
+State 170
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   64            | expressions OR expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+
+    $default  reduce using rule 64 (expressions)
+
+
+State 171
+
+  114 func_invoke: ID '(' expressionList ')' .
+
+    $default  reduce using rule 114 (func_invoke)
+
+
+State 172
+
+  112 nonEmptyExpressionList: nonEmptyExpressionList ',' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 187
+    func_invoke  go to state 87
+
+
+State 173
+
+   83 simple: variable '=' expressions ';' .
+
+    $default  reduce using rule 83 (simple)
+
+
+State 174
+
+   27 nonEmptyArgument: nonEmptyArgument ',' data_type . variable
+
+    ID  shift, and go to state 70
+
+    variable  go to state 188
+
+
+State 175
+
+   24 index: index '[' expressions ']' .
+
+    $default  reduce using rule 24 (index)
+
+
+State 176
+
+   50 nonEmptyExpressions: expression .
+
+    $default  reduce using rule 50 (nonEmptyExpressions)
+
+
+State 177
+
+   36 init_var: ID index '=' '{' nonEmptyExpressions . '}'
+   49 nonEmptyExpressions: nonEmptyExpressions . ',' expression
+
+    ','  shift, and go to state 189
+    '}'  shift, and go to state 190
+
+
+State 178
+
+   89 while: WHILE '(' expressions ')' compound .
+
+    $default  reduce using rule 89 (while)
+
+
+State 179
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   90 while: DO compound WHILE '(' expressions . ')' ';'
+
+    ')'  shift, and go to state 191
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+
+State 180
+
+   88 condition: IF '(' expressions ')' ELSE . compound
+
+    '{'  shift, and go to state 23
+
+    compound  go to state 192
+
+
+State 181
+
+   87 condition: IF '(' expressions ')' compound .
+
+    $default  reduce using rule 87 (condition)
+
+
+State 182
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   92 assignment: ID '=' expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 92 (assignment)
+
+
+State 183
+
+   93 assignment: ID index '=' . expressions
+
+    '('         shift, and go to state 76
+    '-'         shift, and go to state 77
+    '!'         shift, and go to state 78
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 85
+    expressions  go to state 193
+    func_invoke  go to state 87
+
+
+State 184
+
+   96 nonEmptyAssignments: nonEmptyAssignments ',' assignment .
+
+    $default  reduce using rule 96 (nonEmptyAssignments)
+
+
+State 185
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+  102 ctrexpr: expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 102 (ctrexpr)
+
+
+State 186
+
+   91 for: FOR '(' initexpr ';' ctrexpr . ';' increxpr ')' compound
+
+    ';'  shift, and go to state 194
+
+
+State 187
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+  112 nonEmptyExpressionList: nonEmptyExpressionList ',' expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 112 (nonEmptyExpressionList)
+
+
+State 188
+
+   27 nonEmptyArgument: nonEmptyArgument ',' data_type variable .
+
+    $default  reduce using rule 27 (nonEmptyArgument)
+
+
+State 189
+
+   49 nonEmptyExpressions: nonEmptyExpressions ',' . expression
+
+    INTEGER     shift, and go to state 79
+    REALNUMBER  shift, and go to state 80
+    TRUE        shift, and go to state 81
+    FALSE       shift, and go to state 82
+    STRCONTENT  shift, and go to state 83
+    ID          shift, and go to state 44
+
+    variable     go to state 90
+    expression   go to state 195
+    func_invoke  go to state 87
+
+
+State 190
+
+   36 init_var: ID index '=' '{' nonEmptyExpressions '}' .
+
+    $default  reduce using rule 36 (init_var)
+
+
+State 191
+
+   90 while: DO compound WHILE '(' expressions ')' . ';'
+
+    ';'  shift, and go to state 196
+
+
+State 192
+
+   88 condition: IF '(' expressions ')' ELSE compound .
+
+    $default  reduce using rule 88 (condition)
+
+
+State 193
+
+   52 expressions: expressions . '+' expressions
+   53            | expressions . '-' expressions
+   54            | expressions . '*' expressions
+   55            | expressions . '/' expressions
+   56            | expressions . '%' expressions
+   57            | expressions . '<' expressions
+   58            | expressions . LE expressions
+   59            | expressions . EQ expressions
+   60            | expressions . GE expressions
+   61            | expressions . '>' expressions
+   62            | expressions . NQ expressions
+   63            | expressions . AND expressions
+   64            | expressions . OR expressions
+   93 assignment: ID index '=' expressions .
+
+    '+'  shift, and go to state 124
+    '-'  shift, and go to state 125
+    '*'  shift, and go to state 126
+    '/'  shift, and go to state 127
+    '%'  shift, and go to state 128
+    '<'  shift, and go to state 129
+    LE   shift, and go to state 130
+    EQ   shift, and go to state 131
+    GE   shift, and go to state 132
+    '>'  shift, and go to state 133
+    NQ   shift, and go to state 134
+    AND  shift, and go to state 135
+    OR   shift, and go to state 136
+
+    $default  reduce using rule 93 (assignment)
+
+
+State 194
+
+   91 for: FOR '(' initexpr ';' ctrexpr ';' . increxpr ')' compound
+
+    ID  shift, and go to state 112
+
+    ')'       reduce using rule 95 (assignments)
+    ')'       [reduce using rule 106 (increxpr)]
+    $default  reduce using rule 95 (assignments)
+
+    assignment           go to state 114
+    assignments          go to state 197
+    nonEmptyAssignments  go to state 116
+    increxpr             go to state 198
+    func_invoke          go to state 199
+
+
+State 195
+
+   49 nonEmptyExpressions: nonEmptyExpressions ',' expression .
+
+    $default  reduce using rule 49 (nonEmptyExpressions)
+
+
+State 196
+
+   90 while: DO compound WHILE '(' expressions ')' ';' .
+
+    $default  reduce using rule 90 (while)
+
+
+State 197
+
+  104 increxpr: assignments .
+
+    $default  reduce using rule 104 (increxpr)
+
+
+State 198
+
+   91 for: FOR '(' initexpr ';' ctrexpr ';' increxpr . ')' compound
+
+    ')'  shift, and go to state 200
+
+
+State 199
+
+  105 increxpr: func_invoke .
+
+    $default  reduce using rule 105 (increxpr)
+
+
+State 200
+
+   91 for: FOR '(' initexpr ';' ctrexpr ';' increxpr ')' . compound
+
+    '{'  shift, and go to state 23
+
+    compound  go to state 201
+
+
+State 201
+
+   91 for: FOR '(' initexpr ';' ctrexpr ';' increxpr ')' compound .
+
+    $default  reduce using rule 91 (for)
