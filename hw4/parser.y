@@ -22,7 +22,46 @@ struct PType *funcReturn;
 __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
-const char* types[] = { "X", "I", "Z", "XX", "F", "D" };
+const char types[] = { 'V', 'I', 'Z', 'X', 'F', 'D' };
+
+//>>>>>>>>>>>>>>>>>>>> function 
+void gen_func1(char* id) {
+	fprintf(java,".method public static %s",id);
+}
+void gen_funcArg(struct param_sem* params){
+	char param[100];
+	int base = 0;
+	struct param_sem *p = params;
+	for( p = params ; p != NULL ; p = p->next ){
+		param[base++] = types[p->pType->type];
+	}
+	param[base] = '\0';
+	fprintf(java, "(%s)", param);
+}
+void gen_funcMain() {
+	fprintf(java,"([Ljava/lang/String;)");
+}
+void gen_funct(){
+	fprintf(java,".limit stack 100\n");
+	fprintf(java,".limit locals 100\n");
+}
+void gen_functMain(){
+	fprintf(java,"new java/util/Scanner\n");
+	fprintf(java,"dup\n");
+	fprintf(java,"getstatic java/lang/System/in Ljava/io/InputStream;\n");
+	fprintf(java,"invokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n");
+	fprintf(java, "putstatic %s/_sc Ljava/util/Scanner;\n",fileName);
+}
+void gen_funcRet(struct PType *ret){
+	fprintf(java,"%c\n",types[ret->type]);
+}
+void gen_funcEnd(){
+	fprintf(java,".end method\n");
+}
+
+
+//>>>>>>>>>>
+
 
 %}
 
@@ -98,8 +137,20 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				else{
 					insertFuncIntoSymTable( symbolTable, $2, 0, $1, scope, __TRUE );
 				}
+				gen_func1($2);
+				if ( !strcmp("main",$2) ){
+					gen_funcMain();
+				}
+				else {
+					gen_funcArg(NULL);
+				}
+				gen_funcRet($1);
+				gen_funct();
+				if ( !strcmp("main",$2) ) {
+					gen_functMain();
+				}
 			}
-			compound_statement { funcReturn = 0; }	
+			compound_statement { funcReturn = 0; gen_funcEnd();}	
 		  | scalar_type ID L_PAREN parameter_list R_PAREN  
 			{				
 				funcReturn = $1;
@@ -117,15 +168,28 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					if( node != 0 ){
 						if(verifyFuncDeclaration( symbolTable, $4, $1, node ) == __TRUE){	
 							insertParamIntoSymTable( symbolTable, $4, scope+1 );
+							
 						}				
 					}
 					else{
 						insertParamIntoSymTable( symbolTable, $4, scope+1 );				
 						insertFuncIntoSymTable( symbolTable, $2, $4, $1, scope, __TRUE );
 					}
+					gen_func1($2);
+					if ( !strcmp("main",$2) ){
+						gen_funcMain();
+					}
+					else {
+						gen_funcArg($4);
+					}
+					gen_funcRet($1);
+					gen_funct();
+					if ( !strcmp("main",$2) ) {
+						gen_functMain();
+					}
 				}
 			} 	
-			compound_statement { funcReturn = 0; }
+			compound_statement { funcReturn = 0; gen_funcEnd(); }
 		  | VOID ID L_PAREN R_PAREN 
 			{
 				funcReturn = createPType(VOID_t); 
@@ -138,8 +202,20 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				else{
 					insertFuncIntoSymTable( symbolTable, $2, 0, createPType( VOID_t ), scope, __TRUE );	
 				}
+				gen_func1($2);
+				if ( !strcmp("main",$2) ){
+					gen_funcMain();
+				}
+				else {
+					gen_funcArg(NULL);
+				}
+				gen_funcRet(funcReturn);
+				gen_funct();
+				if ( !strcmp("main",$2) ) {
+					gen_functMain();
+				}
 			}
-			compound_statement { funcReturn = 0; }	
+			compound_statement { funcReturn = 0; gen_funcEnd(); }	
 		  | VOID ID L_PAREN parameter_list R_PAREN
 			{									
 				funcReturn = createPType(VOID_t);
@@ -164,8 +240,20 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 						insertFuncIntoSymTable( symbolTable, $2, $4, createPType( VOID_t ), scope, __TRUE );
 					}
 				}
+				gen_func1($2);
+				if ( !strcmp("main",$2) ){
+					gen_funcMain();
+				}
+				else {
+					gen_funcArg($4);
+				}
+				gen_funcRet(funcReturn);
+				gen_funct();
+				if ( !strcmp("main",$2) ) {
+					gen_functMain();
+				}
 			} 
-			compound_statement { funcReturn = 0; }		  
+			compound_statement { funcReturn = 0; gen_funcEnd(); }		  
 		  ;
 
 funct_decl : scalar_type ID L_PAREN R_PAREN SEMICOLON
@@ -233,7 +321,7 @@ var_decl : scalar_type identifier_list SEMICOLON
 							insertTab( symbolTable, newNode );											
 							
 							if ( scope == 0 ) {
-								fprintf(java, ".field public static %s %s\n", ptr->para->idlist->value, types[$1->type] );
+								fprintf(java, ".field public static %s %c\n", ptr->para->idlist->value, types[$1->type] );
 							}
 						}
 					}
@@ -385,7 +473,7 @@ dim : dim ML_BRACE INT_CONST MR_BRACE
 				fprintf( stdout, "########## Error at Line#%d: array size error!! ##########\n", linenum );
 				semError = __TRUE;
 			}			
-			else{		
+			else{
 				$$ = createPType( VOID_t ); 			
 				increaseArrayDim( $$, 0, $2 );
 			}		
@@ -428,8 +516,15 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 							flagRHS = verifyExistence( symbolTable, $3, scope, __FALSE );
 						}
 						// if both LHS and RHS are exists, verify their type
-						if( flagLHS==__TRUE && flagRHS==__TRUE )
+						if( flagLHS==__TRUE && flagRHS==__TRUE ){
 							verifyAssignmentTypeMatch( $1, $3 );
+							if ( scope == 0 ){
+								fprintf(java, "putstatic test/id ");
+							}
+							else {
+								fprintf(java, "istore ");
+							}
+						}
 					}
 				 | PRINT logical_expression SEMICOLON { verifyScalarExpr( $2, "print" ); }
 				 | READ variable_reference SEMICOLON 
