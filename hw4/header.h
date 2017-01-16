@@ -4,7 +4,7 @@
 #define HASHBUNCH 23
 
 typedef enum { __FALSE, __TRUE } __BOOLEAN;
-typedef enum { VOID_t, INTEGER_t, BOOLEAN_t, STRING_t, FLOAT_t, DOUBLE_t,  ARRAY_t, FUNCTION_t, \
+typedef enum { VOID_t, INTEGER_t, FLOAT_t, DOUBLE_t, BOOLEAN_t, STRING_t, ARRAY_t, FUNCTION_t, \
 VARIABLE_t, PARAMETER_t, CONSTANT_t, ERROR_t, ID_LIST } SEMTYPE;
 typedef enum { ADD_t, SUB_t, MUL_t, DIV_t, MOD_t, LT_t, LE_t, EQ_t, GE_t, GT_t, NE_t, AND_t, OR_t, NOT_t, NONE_t } OPERATOR;
 

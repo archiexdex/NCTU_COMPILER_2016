@@ -23,7 +23,7 @@ struct PType *funcReturn;
 __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
-const char types[] = { 'V', 'I', 'Z', 'X', 'F', 'D' };
+const char types[] = { 'V', 'I', 'F', 'D' ,'Z', 'X'};
 char ConstString[100];
 int ConstBool = 0;
 int ConstInt = 0;
@@ -97,14 +97,16 @@ void gen_constVal( struct expr_sem *expr){
 }
 
 //>>>>>>>>>>>>>>>>>>>> print & read
-void gen_print( struct expr_sem *expr ){
+void gen_print1(){
 	fprintf(java,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+	
+}
+void gen_print2( struct expr_sem *expr ){
 	char tmp = types[expr->pType->type];
 	if( tmp == 'X' ){
 		fprintf(java,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
 	}
 	else {
-		
 		fprintf(java,"invokevirtual java/io/PrintStream/print(%c)V\n",tmp);
 	}
 }
@@ -144,7 +146,71 @@ void gen_read( struct expr_sem *expr , int scope,  int top) {
 
 }
 //>>>>>>>>>>>>>>>>>>>> expression
+void gen_expre(struct expr_sem *a, struct expr_sem *b, int mode) {
+	
+	int ta = a->pType->type, tb = b->pType->type;
+	// bool
+	if ( ta == 4 && tb == 4 ){
+		if( mode == 6 ){
+			fprintf(java, "iand\n");
+		}
+		else if( mode == 7 ){
+			fprintf(java, "ior\n");
+		}
+		else if( mode == 8 ) {
+			fprintf(java, "ixor\n");
+		}
+	}
+	// int float double 
+	else if( 1 <= ta <= 3 && 1 <= tb <= 4 ){
+		
+		int m = ta, flg = 0;
+		if ( tb > ta ) m = tb, flg = 1;
+		if ( ta > tb ) m = ta, flg = 1;
+		if ( flg ) {
+			fprintf(java, "i2f\n");
+		}
+		if ( m == 1 ){
+			if ( mode == 0 ) {
+				fprintf(java, "iadd\n");
+			}
+			else if (mode == 1) {
+				fprintf(java, "isub\n");
+			}
+			else if (mode == 2) {
+				fprintf(java, "imul\n");
+			}
+			else if (mode == 3) {
+				fprintf(java, "idiv\n");
+			}
+			else if(mode == 4) {
+				fprintf(java, "irem\n");
+			}
+			else if(mode == 5) {
+				fprintf(java, "ineg\n");
+			}
+		}
+		else {
+			if ( mode == 0 ) {
+				fprintf(java, "fadd\n");
+			}
+			else if (mode == 1) {
+				fprintf(java, "fsub\n");
+			}
+			else if (mode == 2) {
+				fprintf(java, "fmul\n");
+			}
+			else if (mode == 3) {
+				fprintf(java, "fdiv\n");
+			}
+			else if(mode == 5) {
+				fprintf(java, "fneg\n");
+			}
+		}
+	}
 
+
+}
 
 //>>>>>>>>>>>>>>>>>>>> function 
 void gen_func1(char* id) {
@@ -672,9 +738,10 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 							gen_store($1);
 						}
 					}
-				 | PRINT logical_expression SEMICOLON { 
-				 	    verifyScalarExpr( $2, "print" ); 
-				 	    gen_print($2);
+				 | PRINT { gen_print1(); } logical_expression SEMICOLON { 
+				 	    verifyScalarExpr( $3, "print" ); 
+				 	    
+				 	    gen_print2($3);
 				   }	
 				 | READ variable_reference SEMICOLON 
 					{ 
@@ -860,7 +927,7 @@ arithmetic_expression : arithmetic_expression add_op term
 			{
 				verifyArithmeticOp( $1, $2, $3 );
 				$$ = $1;
-
+				gen_expre($1,$3,0);
 			}
                    | relation_expression { $$ = $1; }
 		   | term { $$ = $1; }
@@ -1018,7 +1085,6 @@ literal_const : INT_CONST
 				{
 					$$ = createConstAttr( STRING_t, $1 );
 					strcpy(ConstString, $$->value.stringVal);
-
 				}
 			  | TRUE
 				{
