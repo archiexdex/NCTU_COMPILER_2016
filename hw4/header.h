@@ -105,6 +105,7 @@ union SymAttr {
 struct SymNode {
 	char *name;
 	int scope;		
+	int addr;
 	SEMTYPE category;		
 	struct PType *type;
 	union SymAttr *attribute;

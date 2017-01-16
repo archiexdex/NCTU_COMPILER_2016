@@ -330,7 +330,7 @@ float scientificToFloat( const char *str );
 
 <STR>\"	{
 		//LIST;
-		//strcat( buf, "\"");
+		strcat( buf, "\"");
 		yylval.lexeme = strdup(strContent);	/* pass STR_CONST to parser */
 	
 		if( Opt_Token)
@@ -371,6 +371,7 @@ float scientificToFloat( const char *str );
   	      if (Opt_Source)
   	        printf("%d:%s\n", linenum, buf);
 		  fprintf(java,"; Line #%d: %s\n",linenum, buf);
+		  printf(" >>> Line #%d: %s\n",linenum, buf);
   	      linenum++;
   	      buf[0] = '\0';
         }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "header.h"
 #include "symtab.h"
 
@@ -28,13 +29,17 @@ int  main( int argc, char **argv )
 				exit(-1);
 		}
 		yyin = fp;
-		char *nfile = argv[1];
-		nfile[ strlen(nfile)-1] = 'j';
-		java = fopen( nfile, "w" );
-		fprintf(java,"; %s\n",nfile);
-		nfile[ strlen(nfile)-2] = '\0';
-		fprintf(java, ".class public %s\n", nfile);
+		for ( int i = 0 ; i < strlen(argv[1] ); ++i ){
+			fileName[i] = argv[1][i];
+		}
+		fileName[ strlen(argv[1]) ] = '\0';
+		fileName[ strlen(fileName)-1] = 'j';
+		java = fopen( fileName, "w" );
+		fprintf(java,"; %s\n",fileName);
+		fileName[ strlen(fileName)-2] = '\0';
+		fprintf(java, ".class public %s\n", fileName);
 		fprintf(java, ".super java/lang/Object\n");
+		fprintf(java, ".field public static _sc Ljava/util/Scanner;\n");
 		
 	}
 	else

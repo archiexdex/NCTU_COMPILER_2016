@@ -10,10 +10,11 @@ int foo( int a ) {
 i = i + 1; }
     return result;
 }
-int main() {
+void main() {
     int c ;
     read a;
-    c = foo( a );
+    c = foo( a);
+    read c;
     print c;
     print "\n";
     if( c >= 100 ) {

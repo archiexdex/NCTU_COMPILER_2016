@@ -71,7 +71,7 @@ struct ConstAttr *createConstAttr( SEMTYPE type, void *value )
 	result->category = type;
 
 	result->hasMinus = __FALSE;
-
+	int tmp = 0;
 	switch( type ) {
 	 case INTEGER_t:
 		result->value.integerVal = *(int*)value;
@@ -88,13 +88,14 @@ struct ConstAttr *createConstAttr( SEMTYPE type, void *value )
 		strcpy( result->value.stringVal, (char *)value );
 		break;
 	 case BOOLEAN_t:
-		result->value.booleanVal = *(int*)value;
+	 	tmp = *(int*)value;
+		result->value.booleanVal = tmp == 0? __FALSE : __TRUE;
 		break;
-         case DOUBLE_t:
-                result->value.doubleVal = *(double*)value;
-                if( *(double*)value < 0.0 )
-                        result->hasMinus = __TRUE;
-                break;
+     case DOUBLE_t:
+        result->value.doubleVal = *(double*)value;
+        if( *(double*)value < 0.0 )
+        result->hasMinus = __TRUE; 
+		break;
 	}
 	return result;
 }
@@ -609,7 +610,7 @@ void verifyModOp( struct expr_sem *op1, struct expr_sem *op2 )
 	}
 }
 
-void verifyArithmeticOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op2 ) 
+void verifyArithmeticOp( struct expr_sem *op1, OPERATOR oper, struct expr_sem *op2 ) 
 {
 
 	if( (op1->pType->type)==ERROR_t || (op2->pType->type)==ERROR_t ) {
@@ -617,7 +618,7 @@ void verifyArithmeticOp( struct expr_sem *op1, OPERATOR operator, struct expr_se
 	}
 	else if( op2->beginningOp != NONE_t ) {
 		fprintf( stdout, "########## Error at Line#%d: adjacent operator '", linenum); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout ,"' and '" );
 		printOperator( op2->beginningOp );
 		fprintf( stdout ,"'\n" );
@@ -625,14 +626,14 @@ void verifyArithmeticOp( struct expr_sem *op1, OPERATOR operator, struct expr_se
 	}
 	else if( (op1->pType->dimNum)!=0 || (op2->pType->dimNum)!=0 ) {
 		fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout ,"' are array_type ##########\n" );
 		op1->pType->type = ERROR_t;		
 	}
 	else {
 		if( op1->pType->type==STRING_t && op2->pType->type==STRING_t ) {	// string concatenation			
 				fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum); semError = __TRUE;
-				printOperator( operator );
+				printOperator( oper );
 				fprintf( stdout ,"' are string type ##########\n" );			
 		}
 		else if( ((op1->pType->type==INTEGER_t || op1->pType->type==FLOAT_t || op1->pType->type==DOUBLE_t) && \
@@ -651,21 +652,21 @@ void verifyArithmeticOp( struct expr_sem *op1, OPERATOR operator, struct expr_se
 		}
 		else {	// fail verify, dump error message
 			fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum); semError = __TRUE;
-			printOperator( operator );
+			printOperator( oper );
 			fprintf( stdout, "' are not integer/real ##########\n" );
 			op1->pType->type = ERROR_t;		
 		}
 	}
 }
 
-void verifyRelOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op2 )
+void verifyRelOp( struct expr_sem *op1, OPERATOR oper, struct expr_sem *op2 )
 {
 	if( (op1->pType->type)==ERROR_t || (op2->pType->type)==ERROR_t ) {
 		op1->pType->type = ERROR_t;
 	}
 	else if( op2->beginningOp != NONE_t ) {
 		fprintf( stdout, "########## Error at Line#%d: adjacent operator '", linenum); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout ,"' and '" );
 		printOperator( op2->beginningOp );
 		fprintf( stdout ,"'\n" );
@@ -673,15 +674,15 @@ void verifyRelOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op2 
 	}
 	else if( (op1->pType->dimNum)!=0 || (op2->pType->dimNum)!=0 ) {
 		fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout ,"' are array_type ##########\n" );
 		op1->pType->type = ERROR_t;		
 	}
 	else if( !((op1->pType->type==INTEGER_t || op1->pType->type==FLOAT_t || op1->pType->type==DOUBLE_t) && (op2->pType->type==INTEGER_t || op2->pType->type==FLOAT_t || op2->pType->type==DOUBLE_t)) ) {	
-		if( op1->pType->type==BOOLEAN_t && op2->pType->type==BOOLEAN_t && ( operator==EQ_t || operator==NE_t )){}
+		if( op1->pType->type==BOOLEAN_t && op2->pType->type==BOOLEAN_t && ( oper ==EQ_t || oper ==NE_t )){}
 		else{
 			fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum); semError = __TRUE;
-			printOperator( operator );
+			printOperator( oper );
 			fprintf( stdout, "' are not integer/real or the same type##########\n" );
 			op1->pType->type = ERROR_t;
 		}
@@ -691,14 +692,14 @@ void verifyRelOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op2 
 	}
 }
 
-void verifyAndOrOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op2 )
+void verifyAndOrOp( struct expr_sem *op1, OPERATOR oper, struct expr_sem *op2 )
 {
 	if( (op1->pType->type)==ERROR_t || (op2->pType->type)==ERROR_t ) {
 		op1->pType->type = ERROR_t;
 	}
 	else if( op2->beginningOp != NONE_t ) {
 		fprintf( stdout, "########## Error at Line#%d: adjacent operator '", linenum); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout ,"' and '" );
 		printOperator( op2->beginningOp );
 		fprintf( stdout ,"' ##########\n" );
@@ -706,13 +707,13 @@ void verifyAndOrOp( struct expr_sem *op1, OPERATOR operator, struct expr_sem *op
 	}
 	else if( (op1->pType->dimNum)!=0 || (op2->pType->dimNum)!=0 ) {
 		fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum ); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout, "' are array_type ##########\n" );
 		op1->pType->type = ERROR_t;		
 	}
 	else if( (op1->pType->type)!=BOOLEAN_t || (op2->pType->type)!=BOOLEAN_t ) {
 		fprintf( stdout, "########## Error at Line#%d: operand(s) between '", linenum ); semError = __TRUE;
-		printOperator( operator );
+		printOperator( oper );
 		fprintf( stdout, "' are not boolean ##########\n" );
 		op1->pType->type = ERROR_t;
 	}
@@ -849,7 +850,7 @@ void verifyReturnStatement( struct expr_sem *expr, struct PType *funcReturn )
 	}
 }
 
-__BOOLEAN insertParamIntoSymTable( struct SymTable *table, struct param_sem *params, int scope )
+__BOOLEAN insertParamIntoSymTable( struct SymTable *table, struct param_sem *params, int scope , int *addr)
 {
 	__BOOLEAN result = __FALSE;
 
@@ -870,7 +871,7 @@ __BOOLEAN insertParamIntoSymTable( struct SymTable *table, struct param_sem *par
 				for( idPtr=(parPtr->idlist) ; idPtr!=0 ; idPtr=(idPtr->next) ) {
 					if( verifyRedeclaration( table, idPtr->value, scope ) ==__FALSE ) { result = __TRUE;  }
 					else {	// without error, insert into symbol table
-						newNode = createParamNode( idPtr->value, scope, parPtr->pType );
+						newNode = createParamNode( idPtr->value, scope, parPtr->pType , ++(*addr) ) ;
 						insertTab( table, newNode );
 					}
 				}
@@ -938,7 +939,7 @@ void insertFuncIntoSymTable( struct SymTable *table, const char *id, struct para
 			}
 		}
 	
-		struct SymNode *newNode = createFuncNode( id, scope, retType, formalParam );
+		struct SymNode *newNode = createFuncNode( id, scope, retType, formalParam , -2);
 		newNode->isFuncDefine = isDefine;
 		insertTab( table, newNode );
 	}

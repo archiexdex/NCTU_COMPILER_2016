@@ -1,0 +1,34 @@
+TARGET = parser
+OBJECT = lex.yy.c y.tab.c y.tab.o lex.yy.o y.output parser y.tab.h main.o semcheck.o symtab.o
+CC = gcc -g
+CXX = g++ 
+CXXFLGS = -Wall -Wextra -pedantic -g3 -Wno-unused-function -std=c++11
+LEX = flex
+LEXXX = flex++
+YACC = yacc -v
+YACCFLAG = -dvt
+LIBS = -lfl
+
+all: $(TARGET)
+
+parser: y.tab.c lex.yy.o main.cpp semcheck.o symtab.o
+	$(CXX) $^ -o $(TARGET)  $(CXXFLGS) $(LIBS)
+
+y.tab.o: y.tab.c
+	$(CC) -c y.tab.c
+
+y.tab.c: parser.y
+	$(YACC) $(YACCFLAG) parser.y
+
+lex.yy.o: lex.yy.c
+	$(CC) -c lex.yy.c
+
+lex.yy.c: lex.l
+	$(LEX) lex.l
+
+#main.o: main.cpp
+#	$(CXX) -c main.cpp
+
+clean:
+	rm -f $(TARGET) $(OBJECT)
+

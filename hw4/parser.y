@@ -12,6 +12,7 @@ extern FILE	*yyin;
 extern char	*yytext;
 extern char buf[256];
 extern int Opt_Symbol;		/* declared in lex.l */
+//extern "C" int yylex(void);
 extern FILE *java;
 
 int scope = 0;
@@ -23,6 +24,119 @@ __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
 const char types[] = { 'V', 'I', 'Z', 'X', 'F', 'D' };
+char ConstString[100];
+int ConstBool = 0;
+int ConstInt = 0;
+float ConstFloat = 0.0;
+double ConstDouble = 0.0;
+int top = -1;
+
+void log(int a){
+	printf(">> %d!!\n",a);
+}
+
+//>>>>>>>>>>>>>>>>>>>> load
+void gen_load(int scope, char* id ) {
+	if ( scope == 0 ) {
+		// fprintf(java, "getstatic %s/%s %c\n", fileName, id);
+	}
+}
+
+//>>>>>>>>>>>>>>>>>>>> store
+void gen_store(int scope, struct expr_sem *expr) {
+	char tmp = types[expr->pType->type];
+	puts(expr->varRef->id);
+	if (scope) {
+		struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
+		
+		if ( tmp == 'I' ){
+			fprintf(java, "istore %d\n", node->addr);
+		}
+		else {
+			fprintf(java, "fstore %d\n", node->addr);	
+		}
+	}
+	else {
+		fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
+	}
+	puts("!!!");
+}
+//>>>>>>>>>>>>>>>>>>>> const value
+void gen_constVal( struct expr_sem *expr){
+	char tmp = types[expr->pType->type];
+	if ( tmp == 'Z' ) {
+		if ( ConstBool ) {
+			fprintf(java, "iconst_1\n");
+		}
+		else {
+			fprintf(java, "iconst_0\n");
+		}
+	}
+	else if ( tmp == 'I' ){
+		fprintf(java, "ldc %d\n", ConstInt);
+	}
+	else if ( tmp == 'F' ){
+		fprintf(java, "ldc %f\n", ConstFloat);
+	}
+	else if ( tmp == 'D' ){
+		fprintf(java, "ldc %d\n", ConstDouble);
+	}
+}
+
+//>>>>>>>>>>>>>>>>>>>> print & read
+void gen_print( struct expr_sem *expr ){
+	fprintf(java,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
+	char tmp = types[expr->pType->type];
+	if( tmp == 'X' ){
+		fprintf(java, "ldc \"%s\"\n", ConstString);
+		fprintf(java,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
+	}
+	else {
+		struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
+		if ( tmp == 'I' ){
+			fprintf(java, "istore %d\n", node->addr);
+		}
+		else {
+			fprintf(java, "fstore %d\n", node->addr);	
+		}
+		fprintf(java,"invokevirtual java/io/PrintStream/print(%c)V\n",tmp);
+	}
+}
+void gen_read( struct expr_sem *expr , int scope,  int top) {
+	fprintf(java,"getstatic %s/_sc Ljava/util/Scanner;\n", fileName);
+	char tmp = types[expr->pType->type];
+	
+	if ( tmp == 'I') {
+		fprintf(java, "invokevirtual java/util/Scanner/nextInt()I\n");
+		if ( scope ) fprintf(java, "istore %d\n", top);
+		else {
+			fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
+		}
+	}
+	else if( tmp == 'Z' ) {
+		fprintf(java, "invokevirtual java/util/Scanner/nextBoolean()Z\n");	
+		if ( scope ) fprintf(java, "istore %d\n", top);
+		else {
+			fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
+		}
+	}
+	else if( tmp == 'F' ) {
+		fprintf(java, "invokevirtual java/util/Scanner/nextFloat()F\n");	
+		if ( scope ) fprintf(java, "fstore %d\n", top);
+		else {
+			fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
+		}
+	}
+	else if( tmp == 'D' ) {
+		fprintf(java, "invokevirtual java/util/Scanner/nextDouble()D\n");	
+		
+		if ( scope ) fprintf(java, "fstore %d\n", top);
+		else {
+			fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
+		}
+	}
+
+}
 
 //>>>>>>>>>>>>>>>>>>>> function 
 void gen_func1(char* id) {
@@ -42,8 +156,8 @@ void gen_funcMain() {
 	fprintf(java,"([Ljava/lang/String;)");
 }
 void gen_funct(){
-	fprintf(java,".limit stack 100\n");
-	fprintf(java,".limit locals 100\n");
+	fprintf(java,".limit stack 128\n");
+	fprintf(java,".limit locals 128\n");
 }
 void gen_functMain(){
 	fprintf(java,"new java/util/Scanner\n");
@@ -58,7 +172,6 @@ void gen_funcRet(struct PType *ret){
 void gen_funcEnd(){
 	fprintf(java,".end method\n");
 }
-
 
 //>>>>>>>>>>
 
@@ -131,6 +244,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				struct SymNode *node;
 				node = findFuncDeclaration( symbolTable, $2 );
 				
+				top = -1;
 				if( node != 0 ){
 					verifyFuncDeclaration( symbolTable, 0, $1, node );
 				}
@@ -156,6 +270,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				funcReturn = $1;
 				
 				paramError = checkFuncParam( $4 );
+				int *ptr = NULL;
 				if( paramError == __TRUE ){
 					fprintf( stdout, "########## Error at Line#%d: param(s) with several fault!! ##########\n", linenum );
 					semError = __TRUE;
@@ -165,15 +280,18 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					struct SymNode *node;
 					node = findFuncDeclaration( symbolTable, $2 );
 
+					top = -1;
+					ptr = &top;
 					if( node != 0 ){
 						if(verifyFuncDeclaration( symbolTable, $4, $1, node ) == __TRUE){	
-							insertParamIntoSymTable( symbolTable, $4, scope+1 );
+							insertParamIntoSymTable( symbolTable, $4, scope+1 , ptr);
 							
 						}				
 					}
 					else{
-						insertParamIntoSymTable( symbolTable, $4, scope+1 );				
+						insertParamIntoSymTable( symbolTable, $4, scope+1 , ptr);
 						insertFuncIntoSymTable( symbolTable, $2, $4, $1, scope, __TRUE );
+						
 					}
 					gen_func1($2);
 					if ( !strcmp("main",$2) ){
@@ -187,6 +305,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					if ( !strcmp("main",$2) ) {
 						gen_functMain();
 					}
+					log(top);
 				}
 			} 	
 			compound_statement { funcReturn = 0; gen_funcEnd(); }
@@ -196,11 +315,13 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				struct SymNode *node;
 				node = findFuncDeclaration( symbolTable, $2 );
 
+				top = -1;
 				if( node != 0 ){
 					verifyFuncDeclaration( symbolTable, 0, createPType( VOID_t ), node );					
 				}
 				else{
 					insertFuncIntoSymTable( symbolTable, $2, 0, createPType( VOID_t ), scope, __TRUE );	
+					
 				}
 				gen_func1($2);
 				if ( !strcmp("main",$2) ){
@@ -230,15 +351,19 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					struct SymNode *node;
 					node = findFuncDeclaration( symbolTable, $2 );
 
+					int *ptr = NULL;
+					top = -1;
+					ptr = &top;
 					if( node != 0 ){
 						if(verifyFuncDeclaration( symbolTable, $4, createPType( VOID_t ), node ) == __TRUE){	
-							insertParamIntoSymTable( symbolTable, $4, scope+1 );				
+							insertParamIntoSymTable( symbolTable, $4, scope+1 , ptr);
 						}
 					}
 					else{
-						insertParamIntoSymTable( symbolTable, $4, scope+1 );				
+						insertParamIntoSymTable( symbolTable, $4, scope+1 , ptr);
 						insertFuncIntoSymTable( symbolTable, $2, $4, createPType( VOID_t ), scope, __TRUE );
 					}
+					
 				}
 				gen_func1($2);
 				if ( !strcmp("main",$2) ){
@@ -252,6 +377,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				if ( !strcmp("main",$2) ) {
 					gen_functMain();
 				}
+				log(top);
 			} 
 			compound_statement { funcReturn = 0; gen_funcEnd(); }		  
 		  ;
@@ -317,12 +443,18 @@ var_decl : scalar_type identifier_list SEMICOLON
 					if( verifyRedeclaration( symbolTable, ptr->para->idlist->value, scope ) == __FALSE ) { }
 					else {
 						if( verifyVarInitValue( $1, ptr, symbolTable, scope ) ==  __TRUE ){	
-							newNode = createVarNode( ptr->para->idlist->value, scope, ptr->para->pType );
-							insertTab( symbolTable, newNode );											
+							
 							
 							if ( scope == 0 ) {
+								newNode = createVarNode( ptr->para->idlist->value, scope, ptr->para->pType ,top);
+								insertTab( symbolTable, newNode );
 								fprintf(java, ".field public static %s %c\n", ptr->para->idlist->value, types[$1->type] );
 							}
+							else {
+								newNode = createVarNode( ptr->para->idlist->value, scope, ptr->para->pType ,++top);
+								insertTab( symbolTable, newNode );
+							}
+							log(top);
 						}
 					}
 				}
@@ -423,17 +555,17 @@ const_decl 	: CONST scalar_type const_list SEMICOLON
 									semError = __TRUE;	
 								}
 								else{
-									newNode = createConstNode( ptr->name, scope, $2, ptr->value );
+									newNode = createConstNode( ptr->name, scope, $2, ptr->value , ++top);
 									insertTab( symbolTable, newNode );
 								}
 							}							
 							else{
-								newNode = createConstNode( ptr->name, scope, $2, ptr->value );
+								newNode = createConstNode( ptr->name, scope, $2, ptr->value , ++top);
 								insertTab( symbolTable, newNode );
 							}
 						}
 						else{
-							newNode = createConstNode( ptr->name, scope, $2, ptr->value );
+							newNode = createConstNode( ptr->name, scope, $2, ptr->value, ++top );
 							insertTab( symbolTable, newNode );
 						}
 					}
@@ -518,19 +650,22 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 						// if both LHS and RHS are exists, verify their type
 						if( flagLHS==__TRUE && flagRHS==__TRUE ){
 							verifyAssignmentTypeMatch( $1, $3 );
-							if ( scope == 0 ){
-								fprintf(java, "putstatic test/id ");
-							}
-							else {
-								fprintf(java, "istore ");
-							}
+							gen_store(scope, $1);
 						}
 					}
-				 | PRINT logical_expression SEMICOLON { verifyScalarExpr( $2, "print" ); }
+				 | PRINT logical_expression SEMICOLON { 
+				 	    verifyScalarExpr( $2, "print" ); 
+				 	    gen_print($2);
+				   }	
 				 | READ variable_reference SEMICOLON 
 					{ 
-						if( verifyExistence( symbolTable, $2, scope, __TRUE ) == __TRUE )						
+						if( verifyExistence( symbolTable, $2, scope, __TRUE ) == __TRUE ) {					
 							verifyScalarExpr( $2, "read" ); 
+							struct SymNode *node = 0;
+							node = lookupSymbol( symbolTable, $2->varRef->id, scope, __FALSE );	
+							
+							gen_read($2, node->scope, node->addr);
+						}
 					}
 				 ;
 
@@ -610,6 +745,7 @@ statement_for 	: variable_reference ASSIGN_OP logical_expression
 						// if both LHS and RHS are exists, verify their type
 						if( flagLHS==__TRUE && flagRHS==__TRUE )
 							verifyAssignmentTypeMatch( $1, $3 );
+							
 					}
 					;
 					 
@@ -645,6 +781,7 @@ jump_statement : CONTINUE SEMICOLON
 variable_reference : ID
 					{
 						$$ = createExprSem( $1 );
+						// >>>> 
 					}
 				   | variable_reference dimension
 					{	
@@ -664,7 +801,7 @@ logical_expression : logical_expression OR_OP logical_term
 						verifyAndOrOp( $1, OR_t, $3 );
 						$$ = $1;
 					}
-				   | logical_term { $$ = $1; }
+				   | logical_term { $$ = $1;  }
 				   ;
 
 logical_term : logical_term AND_OP logical_factor
@@ -739,7 +876,7 @@ factor : variable_reference
 	   | SUB_OP variable_reference
 		{
 			if( verifyExistence( symbolTable, $2, scope, __FALSE ) == __TRUE )
-			verifyUnaryMinus( $2 );
+				verifyUnaryMinus( $2 );
 			$$ = $2;
 			$$->beginningOp = SUB_t;
 		}		
@@ -787,6 +924,7 @@ factor : variable_reference
 			  else {
 				$$->beginningOp = NONE_t;
 			  }
+			  gen_constVal($$);
 		}
 	   ;
 
@@ -814,45 +952,55 @@ literal_const : INT_CONST
 				{
 					int tmp = $1;
 					$$ = createConstAttr( INTEGER_t, &tmp );
+					ConstInt = tmp;
 				}
 			  | SUB_OP INT_CONST
 				{
 					int tmp = -$2;
 					$$ = createConstAttr( INTEGER_t, &tmp );
+					ConstInt = tmp;
 				}
 			  | FLOAT_CONST
 				{
 					float tmp = $1;
 					$$ = createConstAttr( FLOAT_t, &tmp );
+					ConstFloat = tmp;
 				}
 			  | SUB_OP FLOAT_CONST
 			    {
 					float tmp = -$2;
 					$$ = createConstAttr( FLOAT_t, &tmp );
+					ConstFloat = tmp;
 				}
 			  | SCIENTIFIC
 				{
 					double tmp = $1;
 					$$ = createConstAttr( DOUBLE_t, &tmp );
+					ConstDouble = tmp;
 				}
 			  | SUB_OP SCIENTIFIC
 				{
 					double tmp = -$2;
 					$$ = createConstAttr( DOUBLE_t, &tmp );
+					ConstDouble = tmp;
 				}
 			  | STR_CONST
 				{
 					$$ = createConstAttr( STRING_t, $1 );
+					strcpy(ConstString, $$->value.stringVal);
+
 				}
 			  | TRUE
 				{
 					SEMTYPE tmp = __TRUE;
 					$$ = createConstAttr( BOOLEAN_t, &tmp );
+					ConstBool = 1;
 				}
 			  | FALSE
 				{
 					SEMTYPE tmp = __FALSE;
 					$$ = createConstAttr( BOOLEAN_t, &tmp );
+					ConstBool = 0;
 				}
 			  ;
 %%

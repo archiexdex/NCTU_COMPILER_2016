@@ -28,7 +28,7 @@ void insertTab( struct SymTable *table, struct SymNode *newNode )
 	}
 }
 
-struct SymNode* createVarNode( const char *name, int scope, struct PType *type ) 
+struct SymNode* createVarNode( const char *name, int scope, struct PType *type, int addr ) 
 {
 	struct SymNode *newNode = (struct SymNode *)malloc( sizeof(struct SymNode) );
 	/* setup name */
@@ -36,6 +36,8 @@ struct SymNode* createVarNode( const char *name, int scope, struct PType *type )
 	strcpy( newNode->name, name );
 	/* setup scope */
 	newNode->scope = scope;
+	/* setup addr */
+	newNode->addr = addr;
 	/* setup type */
 	newNode->type = type;
 	/* Category: variable */
@@ -49,7 +51,7 @@ struct SymNode* createVarNode( const char *name, int scope, struct PType *type )
 	return newNode;
 }
 
-struct SymNode* createParamNode( const char *name, int scope, struct PType *type )
+struct SymNode* createParamNode( const char *name, int scope, struct PType *type, int addr )
 {
 	struct SymNode *newNode = (struct SymNode *)malloc( sizeof(struct SymNode) );
 	/* setup name */
@@ -57,6 +59,8 @@ struct SymNode* createParamNode( const char *name, int scope, struct PType *type
 	strcpy( newNode->name, name );
 	/* setup scope */
 	newNode->scope = scope;
+	/* setup addr */
+	//newNode->addr = addr;
 	/* setup type */
 	newNode->type = type;
 	/* Category: parameter */
@@ -66,11 +70,12 @@ struct SymNode* createParamNode( const char *name, int scope, struct PType *type
 
 	newNode->next = 0;
 	newNode->prev = 0;
+	puts("!!!");
 
 	return newNode;	
 }
 
-struct SymNode * createConstNode( const char *name, int scope, struct PType *pType, struct ConstAttr *constAttr )
+struct SymNode * createConstNode( const char *name, int scope, struct PType *pType, struct ConstAttr *constAttr , int addr)
 {
 	struct SymNode *newNode = (struct SymNode *)malloc( sizeof(struct SymNode) );
 	// setup name /
@@ -78,6 +83,8 @@ struct SymNode * createConstNode( const char *name, int scope, struct PType *pTy
 	strcpy( newNode->name, name );
 	//* setup scope /
 	newNode->scope = scope;
+	//* setup addr */
+	newNode->addr = addr;
 	//* setup type /
 	newNode->type = pType;
 	//* Category: constant /
@@ -92,7 +99,7 @@ struct SymNode * createConstNode( const char *name, int scope, struct PType *pTy
 	return newNode;
 }
 
-struct SymNode *createFuncNode( const char *name, int scope, struct PType *pType, struct FuncAttr *params )
+struct SymNode *createFuncNode( const char *name, int scope, struct PType *pType, struct FuncAttr *params, int addr )
 {
 	struct SymNode *newNode = (struct SymNode *)malloc( sizeof(struct SymNode) );
 	// setup name /
@@ -100,6 +107,8 @@ struct SymNode *createFuncNode( const char *name, int scope, struct PType *pType
 	strcpy( newNode->name, name );
 	//* setup scope /
 	newNode->scope = scope;
+	//* setup addr */
+	newNode->addr = addr;
 	//* setup type /
 	newNode->type = pType;
 	//* Category: constant /
