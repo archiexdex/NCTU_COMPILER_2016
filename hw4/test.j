@@ -26,15 +26,21 @@ ldc 1
 istore 1
 ; Line #7:     i = 1;
 
+iload 1
+iload 0
 ; Line #8:     while( i <= a ) {
 
+iload 2
+iload 1
 istore 2
 ; Line #9:         result = result + i;
 
+iload 1
 ldc 1
 istore 1
 ; Line #10: i = i + 1; }
 
+iload 2
 ; Line #11:     return result;
 
 .end method
@@ -57,6 +63,7 @@ invokevirtual java/util/Scanner/nextInt()I
 putstatic test/a I
 ; Line #15:     read a;
 
+getstatic test/a I
 istore 0
 ; Line #16:     c = foo( a);
 
@@ -65,6 +72,7 @@ invokevirtual java/util/Scanner/nextInt()I
 istore 0
 ; Line #17:     read c;
 
+iload 0
 getstatic java/lang/System/out Ljava/io/PrintStream;
 istore 0
 invokevirtual java/io/PrintStream/print(I)V
@@ -76,6 +84,7 @@ ldc "
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #19:     print "\n";
 
+iload 0
 ldc 100
 ; Line #20:     if( c >= 100 ) {
 

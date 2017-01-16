@@ -36,16 +36,27 @@ void log(int a){
 }
 
 //>>>>>>>>>>>>>>>>>>>> load
-void gen_load(int scope, char* id ) {
-	if ( scope == 0 ) {
-		// fprintf(java, "getstatic %s/%s %c\n", fileName, id);
+void gen_load(int scope, struct expr_sem *expr ) {
+	char tmp = types[expr->pType->type];
+	struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
+	if ( node->scope ) {
+		
+		if ( tmp == 'I' ){
+			fprintf(java, "iload %d\n", node->addr);
+		}
+		else {
+			fprintf(java, "fload %d\n", node->addr);	
+		}
+	}
+	else {
+		fprintf(java, "getstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
 	}
 }
 
 //>>>>>>>>>>>>>>>>>>>> store
 void gen_store(int scope, struct expr_sem *expr) {
 	char tmp = types[expr->pType->type];
-	puts(expr->varRef->id);
+	
 	if (scope) {
 		struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
 		
@@ -59,7 +70,7 @@ void gen_store(int scope, struct expr_sem *expr) {
 	else {
 		fprintf(java, "putstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
 	}
-	puts("!!!");
+	
 }
 //>>>>>>>>>>>>>>>>>>>> const value
 void gen_constVal( struct expr_sem *expr){
@@ -781,7 +792,6 @@ jump_statement : CONTINUE SEMICOLON
 variable_reference : ID
 					{
 						$$ = createExprSem( $1 );
-						// >>>> 
 					}
 				   | variable_reference dimension
 					{	
@@ -872,6 +882,7 @@ factor : variable_reference
 			verifyExistence( symbolTable, $1, scope, __FALSE );
 			$$ = $1;
 			$$->beginningOp = NONE_t;
+			gen_load(scope, $1);
 		}
 	   | SUB_OP variable_reference
 		{
@@ -879,27 +890,32 @@ factor : variable_reference
 				verifyUnaryMinus( $2 );
 			$$ = $2;
 			$$->beginningOp = SUB_t;
+			gen_load(scope, $2);
 		}		
 	   | L_PAREN logical_expression R_PAREN
 		{
 			$2->beginningOp = NONE_t;
 			$$ = $2; 
+			gen_load(scope, $2);
 		}
 	   | SUB_OP L_PAREN logical_expression R_PAREN
 		{
 			verifyUnaryMinus( $3 );
 			$$ = $3;
 			$$->beginningOp = SUB_t;
+			gen_load(scope, $3);
 		}
 	   | ID L_PAREN logical_expression_list R_PAREN
 		{
 			$$ = verifyFuncInvoke( $1, $3, symbolTable, scope );
 			$$->beginningOp = NONE_t;
+			
 		}
 	   | SUB_OP ID L_PAREN logical_expression_list R_PAREN
 	    {
 			$$ = verifyFuncInvoke( $2, $4, symbolTable, scope );
 			$$->beginningOp = SUB_t;
+			
 		}
 	   | ID L_PAREN R_PAREN
 		{
