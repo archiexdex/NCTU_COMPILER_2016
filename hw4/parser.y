@@ -36,7 +36,7 @@ void log(int a){
 }
 
 //>>>>>>>>>>>>>>>>>>>> load
-void gen_load(int scope, struct expr_sem *expr ) {
+void gen_load(struct expr_sem *expr ) {
 	char tmp = types[expr->pType->type];
 	struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
 	if ( node->scope ) {
@@ -54,11 +54,10 @@ void gen_load(int scope, struct expr_sem *expr ) {
 }
 
 //>>>>>>>>>>>>>>>>>>>> store
-void gen_store(int scope, struct expr_sem *expr) {
+void gen_store(struct expr_sem *expr) {
 	char tmp = types[expr->pType->type];
-	
-	if (scope) {
-		struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
+	struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
+	if (node->scope) {
 		
 		if ( tmp == 'I' ){
 			fprintf(java, "istore %d\n", node->addr);
@@ -92,6 +91,9 @@ void gen_constVal( struct expr_sem *expr){
 	else if ( tmp == 'D' ){
 		fprintf(java, "ldc %d\n", ConstDouble);
 	}
+	else if ( tmp == 'X' ){
+		fprintf(java, "ldc \"%s\"\n", ConstString);
+	}
 }
 
 //>>>>>>>>>>>>>>>>>>>> print & read
@@ -99,17 +101,10 @@ void gen_print( struct expr_sem *expr ){
 	fprintf(java,"getstatic java/lang/System/out Ljava/io/PrintStream;\n");
 	char tmp = types[expr->pType->type];
 	if( tmp == 'X' ){
-		fprintf(java, "ldc \"%s\"\n", ConstString);
 		fprintf(java,"invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V\n");
 	}
 	else {
-		struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
-		if ( tmp == 'I' ){
-			fprintf(java, "istore %d\n", node->addr);
-		}
-		else {
-			fprintf(java, "fstore %d\n", node->addr);	
-		}
+		
 		fprintf(java,"invokevirtual java/io/PrintStream/print(%c)V\n",tmp);
 	}
 }
@@ -148,6 +143,8 @@ void gen_read( struct expr_sem *expr , int scope,  int top) {
 	}
 
 }
+//>>>>>>>>>>>>>>>>>>>> expression
+
 
 //>>>>>>>>>>>>>>>>>>>> function 
 void gen_func1(char* id) {
@@ -183,8 +180,19 @@ void gen_funcRet(struct PType *ret){
 void gen_funcEnd(){
 	fprintf(java,".end method\n");
 }
-
-//>>>>>>>>>>
+//>>>>>>>>>>>>>>>>>>>> invoke function 
+void gen_Invoke(char *id, struct expr_sem *exprs){
+	struct SymNode *node = lookupSymbol( symbolTable, id, scope, __FALSE );
+	char tmp = types[node->type->type];
+	char param[100];
+	int base = 0;
+	struct expr_sem *p = NULL;
+	for( p = exprs ; p != NULL ; p = p->next ){
+		param[base++] = types[p->pType->type];
+	}
+	param[base] = '\0';
+	fprintf(java, "invokestatic %s/%s(%s)%c\n", fileName, id, param, tmp);
+}
 
 
 %}
@@ -661,7 +669,7 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 						// if both LHS and RHS are exists, verify their type
 						if( flagLHS==__TRUE && flagRHS==__TRUE ){
 							verifyAssignmentTypeMatch( $1, $3 );
-							gen_store(scope, $1);
+							gen_store($1);
 						}
 					}
 				 | PRINT logical_expression SEMICOLON { 
@@ -764,10 +772,12 @@ statement_for 	: variable_reference ASSIGN_OP logical_expression
 function_invoke_statement : ID L_PAREN logical_expression_list R_PAREN SEMICOLON
 							{
 								verifyFuncInvoke( $1, $3, symbolTable, scope );
+								gen_Invoke($1,$3);
 							}
 						  | ID L_PAREN R_PAREN SEMICOLON
 							{
 								verifyFuncInvoke( $1, 0, symbolTable, scope );
+								gen_Invoke($1,NULL);
 							}
 						  ;
 
@@ -850,6 +860,7 @@ arithmetic_expression : arithmetic_expression add_op term
 			{
 				verifyArithmeticOp( $1, $2, $3 );
 				$$ = $1;
+
 			}
                    | relation_expression { $$ = $1; }
 		   | term { $$ = $1; }
@@ -882,7 +893,7 @@ factor : variable_reference
 			verifyExistence( symbolTable, $1, scope, __FALSE );
 			$$ = $1;
 			$$->beginningOp = NONE_t;
-			gen_load(scope, $1);
+			gen_load($1);
 		}
 	   | SUB_OP variable_reference
 		{
@@ -890,42 +901,45 @@ factor : variable_reference
 				verifyUnaryMinus( $2 );
 			$$ = $2;
 			$$->beginningOp = SUB_t;
-			gen_load(scope, $2);
+			gen_load($2);
 		}		
 	   | L_PAREN logical_expression R_PAREN
 		{
 			$2->beginningOp = NONE_t;
 			$$ = $2; 
-			gen_load(scope, $2);
+			gen_load($2);
 		}
 	   | SUB_OP L_PAREN logical_expression R_PAREN
 		{
 			verifyUnaryMinus( $3 );
 			$$ = $3;
 			$$->beginningOp = SUB_t;
-			gen_load(scope, $3);
+			gen_load($3);
 		}
 	   | ID L_PAREN logical_expression_list R_PAREN
 		{
 			$$ = verifyFuncInvoke( $1, $3, symbolTable, scope );
 			$$->beginningOp = NONE_t;
+			gen_Invoke($1,$3);
 			
 		}
 	   | SUB_OP ID L_PAREN logical_expression_list R_PAREN
 	    {
 			$$ = verifyFuncInvoke( $2, $4, symbolTable, scope );
 			$$->beginningOp = SUB_t;
-			
+			gen_Invoke($2,$4);
 		}
 	   | ID L_PAREN R_PAREN
 		{
 			$$ = verifyFuncInvoke( $1, 0, symbolTable, scope );
 			$$->beginningOp = NONE_t;
+			gen_Invoke($1,NULL);
 		}
 	   | SUB_OP ID L_PAREN R_PAREN
 		{
 			$$ = verifyFuncInvoke( $2, 0, symbolTable, scope );
 			$$->beginningOp = SUB_OP;
+			gen_Invoke($2,NULL);
 		}
 	   | literal_const
 	    {

@@ -64,6 +64,7 @@ putstatic test/a I
 ; Line #15:     read a;
 
 getstatic test/a I
+invokestatic test/foo(I)I
 istore 0
 ; Line #16:     c = foo( a);
 
@@ -74,13 +75,12 @@ istore 0
 
 iload 0
 getstatic java/lang/System/out Ljava/io/PrintStream;
-istore 0
 invokevirtual java/io/PrintStream/print(I)V
 ; Line #18:     print c;
 
-getstatic java/lang/System/out Ljava/io/PrintStream;
 ldc "
 "
+getstatic java/lang/System/out Ljava/io/PrintStream;
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #19:     print "\n";
 
@@ -88,9 +88,9 @@ iload 0
 ldc 100
 ; Line #20:     if( c >= 100 ) {
 
-getstatic java/lang/System/out Ljava/io/PrintStream;
 ldc "c >= 100 
 "
+getstatic java/lang/System/out Ljava/io/PrintStream;
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #21:         print "c >= 100 \n";
 
@@ -98,9 +98,9 @@ invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 ; Line #23:     else {
 
-getstatic java/lang/System/out Ljava/io/PrintStream;
 ldc "c < 100 
 "
+getstatic java/lang/System/out Ljava/io/PrintStream;
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #24:         print "c < 100 \n";
 
