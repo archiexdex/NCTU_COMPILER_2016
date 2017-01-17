@@ -18,4 +18,13 @@ int main() {
 	do {
 		i = i + 1;
 	} while( i < 15 );
+	
+	bool a, b, c;
+	if ( a || b && c ){
+		i = 1;
+	}
+
+
+	return 0;
 }
+

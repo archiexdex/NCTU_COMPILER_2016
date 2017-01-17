@@ -2,7 +2,7 @@
 .class public example_jfile/if_stmt
 .super java/lang/Object
 .field public static _sc Ljava/util/Scanner;
-.method public static main([Ljava/lang/String;)I
+.method public static main([Ljava/lang/String;)V
 .limit stack 128
 .limit locals 128
 new java/util/Scanner
@@ -31,12 +31,12 @@ fstore 1
 fload 0
 fload 1
 fcmpl
-ifeq L0
+ifeq L1
 iconst_0
-goto LL0
-L0:
+goto LL1
+L1:
 iconst_1
-LL0:
+LL1:
 ifeq Lelse0
 ; Line #7: 	if( a == b ) {
 
@@ -69,13 +69,13 @@ Lelse0 :
 fload 0
 fload 1
 fcmpl
-ifgt L1
+ifgt L3
 iconst_0
-goto LL1
-L1:
+goto LL3
+L3:
 iconst_1
-LL1:
-ifeq Lelse1
+LL3:
+ifeq Lelse2
 ; Line #14: 	if( a > b ) {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -103,8 +103,8 @@ invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 ; Line #20: 	
 
-goto Lexit1
-Lelse1 :
+goto Lexit2
+Lelse2 :
 ; Line #21: 	else {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -128,14 +128,16 @@ ldc "
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #25: 		print "\n";
 
-Lexit1 :
+Lexit2 :
 ; Line #26: 	}
 
 ; Line #27: 
 
 ldc 0
+return 
 ; Line #28: 	return 0;
 
+return
 .end method
 ; Line #29: }
 

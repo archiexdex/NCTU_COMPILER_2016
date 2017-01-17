@@ -23,6 +23,7 @@ struct PType *funcReturn;
 __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
+int isMain = 0;
 const char  types[] = { 'V', 'I', 'F', 'D' ,'Z', 'X'};
 const char* reops[] = { "iflt", "ifle", "ifeq", "ifge", "ifgt", "ifne" };
 char ConstString[100];
@@ -32,10 +33,23 @@ float ConstFloat = 0.0;
 double ConstDouble = 0.0;
 int top = -1;
 int re0 = -1;
-int lo  = -1;
+int xd = -1;
+char begin[100];
+char next[100];
+char exixt[100];
+char incr[100];
+char Lelse[100];
+char Lexit[100];
+int stk[100];
 
 void log(int a){
 	printf(">> %d!!\n",a);
+}
+void push(int tmp){
+	stk[++xd] = tmp;
+}
+void pop(){
+	--xd;
 }
 
 //>>>>>>>>>>>>>>>>>>>> load
@@ -213,7 +227,7 @@ void gen_expre(struct expr_sem *a, struct expr_sem *b, int mode) {
 	}
 
 }
-void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
+void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode, int t) {
 	int ta = a->pType->type, tb = b->pType->type;
 	char label1[100], label2[100];
 	if ( ( 1 < ta && ta < 4 )  || ( 1 < tb && tb < 4) ) {
@@ -222,8 +236,8 @@ void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
 	else {
 		fprintf(java, "isub\n");
 	}
-	sprintf(label1, "L%d", re0);
-	sprintf(label2, "LL%d", re0);
+	sprintf(label1, "L%d", t);
+	sprintf(label2, "LL%d", t);
 	fprintf(java, "%s %s\n", reops[mode-5], label1);
 	fprintf(java, "iconst_0\n");
 	fprintf(java, "goto %s\n", label2);
@@ -238,6 +252,7 @@ void gen_func1(char* id) {
 	fprintf(java,".method public static %s",id);
 }
 void gen_funcArg(struct param_sem* params){
+	isMain = 0;
 	char param[100];
 	int base = 0;
 	struct param_sem *p = params;
@@ -248,6 +263,7 @@ void gen_funcArg(struct param_sem* params){
 	fprintf(java, "(%s)", param);
 }
 void gen_funcMain() {
+	isMain = 1;
 	fprintf(java,"([Ljava/lang/String;)V\n");
 }
 void gen_funct(){
@@ -267,6 +283,7 @@ void gen_funcRet(struct PType *ret){
 void gen_funcEnd(struct PType *pType, char *id){
 	
 	if ( !strcmp("main", id) || pType == NULL ) {
+		
 		fprintf(java, "return\n");	
 	}
 	else if ( pType->type == 1 ){
@@ -795,58 +812,75 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 
 conditional_statement : IF L_PAREN R conditional_if  R_PAREN compound_statement { 
 							char label[100];
-							sprintf(label, "Lelse%d",re0);
+							sprintf(label, "Lelse%d",stk[xd]);
 							fprintf(java, "%s :\n", label);
+							// fprintf(java, "%s :\n", Lelse);
+							pop();
 						 }
 					  | IF L_PAREN R conditional_if  R_PAREN compound_statement { 
 							char label[100], exit[100];
-							sprintf(label, "Lelse%d",re0);
-							sprintf(exit, "Lexit%d",re0);
+							
+							sprintf(label, "Lelse%d",stk[xd]);
+							sprintf(exit, "Lexit%d",stk[xd]);
 							fprintf(java, "goto %s\n", exit);
 							fprintf(java, "%s :\n", label);
+							// fprintf(java, "goto %s\n", Lexit);
+							// fprintf(java, "%s :\n", Lelse);
 						 }
 						ELSE compound_statement {
 							char exit[100];
-							sprintf(exit, "Lexit%d",re0);
+							sprintf(exit, "Lexit%d",stk[xd]);
 							fprintf(java, "%s :\n", exit);
+							// fprintf(java, "%s :\n", Lexit);
+							pop();
 						}
 					  ;
 
-R : { ++re0; }
+R : { 
+		push(++re0);
+		// sprintf(Lelse, "Lelse%d",re0);
+		// sprintf(Lexit, "Lexit%d",re0);
+
+	 }
 	;
 
 conditional_if : logical_expression { 
 					verifyBooleanExpr( $1, "if" ); 
 					char label[100];
-					sprintf(label, "Lelse%d",re0);
+					sprintf(label, "Lelse%d",stk[xd]);
 					fprintf(java, "ifeq %s\n", label);
+					// fprintf(java, "ifeq %s\n", Lelse);
 				}	
 
 				
 while_statement : WHILE L_PAREN { 						
 						char tmp[100];
-						sprintf(tmp, "Lbegin%d", ++re0);
+						push(++re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
+
 					} logical_expression { 
 						verifyBooleanExpr( $4, "while" ); 
 						char tmp[100];
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "ifeq %s\n", tmp);
 					} R_PAREN { inloop++; }
 					compound_statement { 
 						inloop--; 
 						char tmp[100];
-						sprintf(tmp, "Lbegin%d", re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "goto %s\n", tmp);
 
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
+						pop();
 					}
 				
 				| { 
 						inloop++; 
 						char tmp[100];
-						sprintf(tmp, "Lbegin%d", ++re0);
+						push(++re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
 
 				} DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON  
@@ -854,54 +888,56 @@ while_statement : WHILE L_PAREN {
 						verifyBooleanExpr( $6, "while" );
 						inloop--; 
 						char tmp[100];
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "ifeq %s\n", tmp);
 
-						sprintf(tmp, "Lbegin%d", re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "goto %s\n", tmp);
 
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
+						pop();
 					}
 				;
-
 
 				
 for_statement : FOR L_PAREN initial_expression SEMICOLON {
 						char tmp[100];
-						sprintf(tmp, "Lbegin%d", ++re0);
+						push(++re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
 					}	control_expression SEMICOLON {
 
 						char tmp[100];
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "ifeq %s\n", tmp);
 
-						sprintf(tmp, "Lnext%d", re0);
+						sprintf(tmp, "Lnext%d", stk[xd]);
 						fprintf(java, "goto %s\n", tmp);
 
-						sprintf(tmp, "Lincr%d", re0);
+						sprintf(tmp, "Lincr%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
 					}
 					increment_expression {
 						char tmp[100];
-						sprintf(tmp, "Lbegin%d", re0);
+						sprintf(tmp, "Lbegin%d", stk[xd]);
 						fprintf(java, "goto %s\n", tmp);
 						
 					} R_PAREN  { 
 						inloop++; 
 						char tmp[100];
-						sprintf(tmp, "Lnext%d", re0);
+						sprintf(tmp, "Lnext%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
 					}
 					compound_statement  { 
 						inloop--; 
 						char tmp[100];
-						sprintf(tmp, "Lincr%d", re0);
+						sprintf(tmp, "Lincr%d", stk[xd]);
 						fprintf(java, "goto %s\n", tmp);
 
-						sprintf(tmp, "Lexit%d", re0);
+						sprintf(tmp, "Lexit%d", stk[xd]);
 						fprintf(java, "%s :\n", tmp);
+						pop();
 					}
 			  ;
 
@@ -992,7 +1028,20 @@ jump_statement : CONTINUE SEMICOLON
 			   | RETURN logical_expression SEMICOLON
 				{
 					verifyReturnStatement( $2, funcReturn );
-
+					int tmp = funcReturn->type;
+					if ( isMain ){
+						// puts("1");
+						fprintf(java, "return \n");
+					}
+					else if ( tmp == 1 ){
+						fprintf(java, "ireturn \n");	
+					}
+					else if( tmp == 2 || tmp == 3 ) {
+						fprintf(java, "freturn \n");
+					}
+					else {
+						fprintf(java, "return \n");
+					}
 					
 				}
 			   ;
@@ -1045,7 +1094,9 @@ relation_expression : arithmetic_expression relation_operator arithmetic_express
 					{
 						verifyRelOp( $1, $2, $3 );
 						$$ = $1;
-						gen_rel($1,$3,$2);
+						push(++re0);
+						gen_rel($1,$3,$2, stk[xd]);
+						pop();
 					}
 					| arithmetic_expression { $$ = $1; }
 					;

@@ -26,15 +26,17 @@ ldc 1
 istore 1
 ; Line #7:     i = 1;
 
+Lbegin0 :
 iload 1
 iload 0
 isub
-ifle L0
+ifle L1
 iconst_0
-goto LL0
-L0:
+goto LL1
+L1:
 iconst_1
-LL0:
+LL1:
+ifeq Lexit1
 ; Line #8:     while( i <= a ) {
 
 iload 2
@@ -47,13 +49,14 @@ iload 1
 ldc 1
 iadd
 istore 1
+goto Lbegin1
+Lexit1 :
 ; Line #10: i = i + 1; }
 
 iload 2
-ireturn
 ; Line #11:     return result;
 
-return
+ireturn
 .end method
 ; Line #12: }
 
@@ -98,13 +101,13 @@ invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 iload 0
 ldc 100
 isub
-ifge L1
+ifge L3
 iconst_0
-goto LL1
-L1:
+goto LL3
+L3:
 iconst_1
-LL1:
-ifeq Lelse1
+LL3:
+ifeq Lelse2
 ; Line #20:     if( c >= 100 ) {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -113,6 +116,20 @@ ldc "c >= 100
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #21:         print "c >= 100 \n";
 
-Lelse1 :
 ; Line #22:     }
+
+goto Lexit2
+Lelse2 :
+; Line #23:     else {
+
+getstatic java/lang/System/out Ljava/io/PrintStream;
+ldc "c < 100 
+"
+invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
+; Line #24:         print "c < 100 \n";
+
+Lexit2 :
+return
+.end method
+; Line #25: } }
 
