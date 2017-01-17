@@ -32,6 +32,7 @@ float ConstFloat = 0.0;
 double ConstDouble = 0.0;
 int top = -1;
 int re0 = -1;
+int lo  = -1;
 
 void log(int a){
 	printf(">> %d!!\n",a);
@@ -221,7 +222,7 @@ void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
 	else {
 		fprintf(java, "isub\n");
 	}
-	sprintf(label1, "L%d", ++re0);
+	sprintf(label1, "L%d", re0);
 	sprintf(label2, "LL%d", re0);
 	fprintf(java, "%s %s\n", reops[mode-5], label1);
 	fprintf(java, "iconst_0\n");
@@ -230,8 +231,6 @@ void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
 	fprintf(java, "iconst_1\n");
 	fprintf(java, "%s:\n", label2);
 }
-//>>>>>>>>>>>>>>>>>>>> if statement
-
 
 
 //>>>>>>>>>>>>>>>>>>>> function 
@@ -779,12 +778,12 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 					}
 				 ;
 
-conditional_statement : IF L_PAREN conditional_if  R_PAREN compound_statement { 
+conditional_statement : IF L_PAREN { ++re0; } conditional_if  R_PAREN compound_statement { 
 							char label[100];
 							sprintf(label, "Lelse%d",re0);
 							fprintf(java, "%s :\n", label);
 						 }
-					  | IF L_PAREN conditional_if  R_PAREN compound_statement { 
+					  | IF L_PAREN { ++re0; } conditional_if  R_PAREN compound_statement { 
 							char label[100], exit[100];
 							sprintf(label, "Lelse%d",re0);
 							sprintf(exit, "Lexit%d",re0);
@@ -805,20 +804,86 @@ conditional_if : logical_expression {
 				}	
 
 				
-while_statement : WHILE L_PAREN logical_expression { verifyBooleanExpr( $3, "while" ); } R_PAREN { inloop++; }
-					compound_statement { inloop--; }
-				| { inloop++; } DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON  
+while_statement : WHILE L_PAREN { 						
+						char tmp[100];
+						sprintf(tmp, "Lbegin%d", ++re0);
+						fprintf(java, "%s :\n", tmp);
+					} logical_expression { 
+						verifyBooleanExpr( $4, "while" ); 
+						char tmp[100];
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "ifeq %s\n", tmp);
+					} R_PAREN { inloop++; }
+					compound_statement { 
+						inloop--; 
+						char tmp[100];
+						sprintf(tmp, "Lbegin%d", re0);
+						fprintf(java, "goto %s\n", tmp);
+
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "%s :\n", tmp);
+					}
+				
+				| { 
+						inloop++; 
+						char tmp[100];
+						sprintf(tmp, "Lbegin%d", ++re0);
+						fprintf(java, "%s :\n", tmp);
+
+				} DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON  
 					{ 
-						 verifyBooleanExpr( $6, "while" );
-						 inloop--; 
-						
+						verifyBooleanExpr( $6, "while" );
+						inloop--; 
+						char tmp[100];
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "ifeq %s\n", tmp);
+
+						sprintf(tmp, "Lbegin%d", re0);
+						fprintf(java, "goto %s\n", tmp);
+
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "%s :\n", tmp);
 					}
 				;
 
 
 				
-for_statement : FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN  { inloop++; }
-					compound_statement  { inloop--; }
+for_statement : FOR L_PAREN initial_expression SEMICOLON {
+						char tmp[100];
+						sprintf(tmp, "Lbegin%d", ++re0);
+						fprintf(java, "%s :\n", tmp);
+					}	control_expression SEMICOLON {
+
+						char tmp[100];
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "ifeq %s\n", tmp);
+
+						sprintf(tmp, "Lnext%d", re0);
+						fprintf(java, "goto %s\n", tmp);
+
+						sprintf(tmp, "Lincr%d", re0);
+						fprintf(java, "%s :\n", tmp);
+					}
+					increment_expression {
+						char tmp[100];
+						sprintf(tmp, "Lbegin%d", re0);
+						fprintf(java, "goto %s\n", tmp);
+						
+					} R_PAREN  { 
+						inloop++; 
+						char tmp[100];
+						sprintf(tmp, "Lnext%d", re0);
+						fprintf(java, "%s :\n", tmp);
+					}
+					compound_statement  { 
+						inloop--; 
+						char tmp[100];
+						sprintf(tmp, "Lincr%d", re0);
+						fprintf(java, "goto %s\n", tmp);
+
+						sprintf(tmp, "Lexit%d", re0);
+						fprintf(java, "%s :\n", tmp);
+					}
 			  ;
 
 initial_expression : initial_expression COMMA statement_for		
@@ -872,8 +937,10 @@ statement_for 	: variable_reference ASSIGN_OP logical_expression
 							flagRHS = verifyExistence( symbolTable, $3, scope, __FALSE );
 						}
 						// if both LHS and RHS are exists, verify their type
-						if( flagLHS==__TRUE && flagRHS==__TRUE )
+						if( flagLHS==__TRUE && flagRHS==__TRUE ){
 							verifyAssignmentTypeMatch( $1, $3 );
+							gen_store($1);
+						}
 							
 					}
 					;
