@@ -23,13 +23,15 @@ struct PType *funcReturn;
 __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
-const char types[] = { 'V', 'I', 'F', 'D' ,'Z', 'X'};
+const char  types[] = { 'V', 'I', 'F', 'D' ,'Z', 'X'};
+const char* reops[] = { "iflt", "ifle", "ifeq", "ifge", "ifgt", "ifne" };
 char ConstString[100];
 int ConstBool = 0;
 int ConstInt = 0;
 float ConstFloat = 0.0;
 double ConstDouble = 0.0;
 int top = -1;
+int re0 = -1;
 
 void log(int a){
 	printf(">> %d!!\n",a);
@@ -162,7 +164,7 @@ void gen_expre(struct expr_sem *a, struct expr_sem *b, int mode) {
 		}
 	}
 	// int float double 
-	else if( 1 <= ta <= 3 && 1 <= tb <= 4 ){
+	else if( 1 <= ta && ta <= 3 && 1 <= tb && tb <= 4 ){
 		
 		int m = ta, flg = 0;
 		if ( tb > ta ) m = tb, flg = 1;
@@ -209,8 +211,27 @@ void gen_expre(struct expr_sem *a, struct expr_sem *b, int mode) {
 		}
 	}
 
-
 }
+void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
+	int ta = a->pType->type, tb = b->pType->type;
+	char label1[100], label2[100];
+	if ( ( 1 < ta && ta < 4 )  || ( 1 < tb && tb < 4) ) {
+		fprintf(java, "fcmpl\n");	
+		fprintf(java, "fsub\n");
+	}
+	else {
+		fprintf(java, "isub\n");
+	}
+	sprintf(label1, "L%d", ++re0);
+	sprintf(label2, "LL%d", re0);
+	fprintf(java, "%s %s\n", reops[mode-5], label1);
+	fprintf(java, "iconst_0\n");
+	fprintf(java, "goto %s\n", label2);
+	fprintf(java, "%s:\n", label1);
+	fprintf(java, "iconst_1\n");
+	fprintf(java, "%s:\n", label2);
+}
+
 
 //>>>>>>>>>>>>>>>>>>>> function 
 void gen_func1(char* id) {
@@ -247,7 +268,7 @@ void gen_funcEnd(){
 	fprintf(java,".end method\n");
 }
 //>>>>>>>>>>>>>>>>>>>> invoke function 
-void gen_Invoke(char *id, struct expr_sem *exprs){
+int gen_Invoke(char *id, struct expr_sem *exprs){
 	struct SymNode *node = lookupSymbol( symbolTable, id, scope, __FALSE );
 	char tmp = types[node->type->type];
 	char param[100];
@@ -258,6 +279,7 @@ void gen_Invoke(char *id, struct expr_sem *exprs){
 	}
 	param[base] = '\0';
 	fprintf(java, "invokestatic %s/%s(%s)%c\n", fileName, id, param, tmp);
+	return node->type->type;
 }
 
 
@@ -887,6 +909,7 @@ logical_expression : logical_expression OR_OP logical_term
 					{
 						verifyAndOrOp( $1, OR_t, $3 );
 						$$ = $1;
+						gen_expre($1,$3,7);
 					}
 				   | logical_term { $$ = $1;  }
 				   ;
@@ -895,6 +918,7 @@ logical_term : logical_term AND_OP logical_factor
 				{
 					verifyAndOrOp( $1, AND_t, $3 );
 					$$ = $1;
+					gen_expre($1,$3,6);
 				}
 			 | logical_factor { $$ = $1; }
 			 ;
@@ -903,6 +927,7 @@ logical_factor : NOT_OP logical_factor
 				{
 					verifyUnaryNOT( $2 );
 					$$ = $2;
+					gen_expre($2,$2,8);
 				}
 			   | relation_expression { $$ = $1; }
 			   ;
@@ -911,6 +936,7 @@ relation_expression : arithmetic_expression relation_operator arithmetic_express
 					{
 						verifyRelOp( $1, $2, $3 );
 						$$ = $1;
+						gen_rel($1,$3,$2);
 					}
 					| arithmetic_expression { $$ = $1; }
 					;
@@ -927,7 +953,7 @@ arithmetic_expression : arithmetic_expression add_op term
 			{
 				verifyArithmeticOp( $1, $2, $3 );
 				$$ = $1;
-				gen_expre($1,$3,0);
+				gen_expre($1,$3,$2);
 			}
                    | relation_expression { $$ = $1; }
 		   | term { $$ = $1; }
@@ -946,6 +972,7 @@ term : term mul_op factor
 				verifyArithmeticOp( $1, $2, $3 );
 			}
 			$$ = $1;
+			gen_expre($1,$3,$2);
 		}
      | factor { $$ = $1; }
 	 ;
@@ -969,6 +996,7 @@ factor : variable_reference
 			$$ = $2;
 			$$->beginningOp = SUB_t;
 			gen_load($2);
+			gen_expre($2,$2,5);
 		}		
 	   | L_PAREN logical_expression R_PAREN
 		{
@@ -982,6 +1010,7 @@ factor : variable_reference
 			$$ = $3;
 			$$->beginningOp = SUB_t;
 			gen_load($3);
+			gen_expre($3,$3,5);
 		}
 	   | ID L_PAREN logical_expression_list R_PAREN
 		{
@@ -994,7 +1023,14 @@ factor : variable_reference
 	    {
 			$$ = verifyFuncInvoke( $2, $4, symbolTable, scope );
 			$$->beginningOp = SUB_t;
-			gen_Invoke($2,$4);
+			int t = gen_Invoke($2,$4);
+			if ( t == 1 ){
+				fprintf(java, "ineg\n");
+			}
+			else if ( t == 2 || t == 3 ){
+				fprintf(java, "fneg\n");
+			}
+
 		}
 	   | ID L_PAREN R_PAREN
 		{
@@ -1006,7 +1042,13 @@ factor : variable_reference
 		{
 			$$ = verifyFuncInvoke( $2, 0, symbolTable, scope );
 			$$->beginningOp = SUB_OP;
-			gen_Invoke($2,NULL);
+			int t = gen_Invoke($2,NULL);
+			if ( t == 1 ){
+				fprintf(java, "ineg\n");
+			}
+			else if ( t == 2 || t == 3 ){
+				fprintf(java, "fneg\n");
+			}
 		}
 	   | literal_const
 	    {

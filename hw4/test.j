@@ -28,6 +28,13 @@ istore 1
 
 iload 1
 iload 0
+isub
+ifle L0
+iconst_0
+goto LL0
+L0:
+iconst_1
+LL0:
 ; Line #8:     while( i <= a ) {
 
 iload 2
@@ -88,6 +95,13 @@ invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 iload 0
 ldc 100
+isub
+ifge L1
+iconst_0
+goto LL1
+L1:
+iconst_1
+LL1:
 ; Line #20:     if( c >= 100 ) {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
