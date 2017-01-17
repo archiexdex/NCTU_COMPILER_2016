@@ -50,8 +50,10 @@ istore 1
 ; Line #10: i = i + 1; }
 
 iload 2
+ireturn
 ; Line #11:     return result;
 
+return
 .end method
 ; Line #12: }
 
@@ -102,6 +104,7 @@ goto LL1
 L1:
 iconst_1
 LL1:
+ifeq Lelse1
 ; Line #20:     if( c >= 100 ) {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -112,6 +115,8 @@ invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 
 ; Line #22:     }
 
+goto Lexit1
+Lelse1 :
 ; Line #23:     else {
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -120,6 +125,8 @@ ldc "c < 100
 invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V
 ; Line #24:         print "c < 100 \n";
 
+Lexit1 :
+return
 .end method
 ; Line #25: } }
 

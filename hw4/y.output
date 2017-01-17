@@ -104,174 +104,177 @@ Grammar
    62                 | READ variable_reference SEMICOLON
 
    63 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement
-   64                      | IF L_PAREN conditional_if R_PAREN compound_statement ELSE compound_statement
 
-   65 conditional_if: logical_expression
+   64 $@7: %empty
 
-   66 $@7: %empty
+   65 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement $@7 ELSE compound_statement
+
+   66 conditional_if: logical_expression
 
    67 $@8: %empty
 
-   68 while_statement: WHILE L_PAREN logical_expression $@7 R_PAREN $@8 compound_statement
+   68 $@9: %empty
 
-   69 $@9: %empty
+   69 while_statement: WHILE L_PAREN logical_expression $@8 R_PAREN $@9 compound_statement
 
-   70 while_statement: $@9 DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
+   70 $@10: %empty
 
-   71 $@10: %empty
+   71 while_statement: $@10 DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement
+   72 $@11: %empty
 
-   73 initial_expression: initial_expression COMMA statement_for
-   74                   | initial_expression COMMA logical_expression
-   75                   | logical_expression
-   76                   | statement_for
-   77                   | %empty
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement
 
-   78 control_expression: control_expression COMMA statement_for
-   79                   | control_expression COMMA logical_expression
-   80                   | logical_expression
-   81                   | statement_for
-   82                   | %empty
+   74 initial_expression: initial_expression COMMA statement_for
+   75                   | initial_expression COMMA logical_expression
+   76                   | logical_expression
+   77                   | statement_for
+   78                   | %empty
 
-   83 increment_expression: increment_expression COMMA statement_for
-   84                     | increment_expression COMMA logical_expression
-   85                     | logical_expression
-   86                     | statement_for
-   87                     | %empty
+   79 control_expression: control_expression COMMA statement_for
+   80                   | control_expression COMMA logical_expression
+   81                   | logical_expression
+   82                   | statement_for
+   83                   | %empty
 
-   88 statement_for: variable_reference ASSIGN_OP logical_expression
+   84 increment_expression: increment_expression COMMA statement_for
+   85                     | increment_expression COMMA logical_expression
+   86                     | logical_expression
+   87                     | statement_for
+   88                     | %empty
 
-   89 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN SEMICOLON
-   90                          | ID L_PAREN R_PAREN SEMICOLON
+   89 statement_for: variable_reference ASSIGN_OP logical_expression
 
-   91 jump_statement: CONTINUE SEMICOLON
-   92               | BREAK SEMICOLON
-   93               | RETURN logical_expression SEMICOLON
+   90 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN SEMICOLON
+   91                          | ID L_PAREN R_PAREN SEMICOLON
 
-   94 variable_reference: ID
-   95                   | variable_reference dimension
+   92 jump_statement: CONTINUE SEMICOLON
+   93               | BREAK SEMICOLON
+   94               | RETURN logical_expression SEMICOLON
 
-   96 dimension: ML_BRACE arithmetic_expression MR_BRACE
+   95 variable_reference: ID
+   96                   | variable_reference dimension
 
-   97 logical_expression: logical_expression OR_OP logical_term
-   98                   | logical_term
+   97 dimension: ML_BRACE arithmetic_expression MR_BRACE
 
-   99 logical_term: logical_term AND_OP logical_factor
-  100             | logical_factor
+   98 logical_expression: logical_expression OR_OP logical_term
+   99                   | logical_term
 
-  101 logical_factor: NOT_OP logical_factor
-  102               | relation_expression
+  100 logical_term: logical_term AND_OP logical_factor
+  101             | logical_factor
 
-  103 relation_expression: arithmetic_expression relation_operator arithmetic_expression
-  104                    | arithmetic_expression
+  102 logical_factor: NOT_OP logical_factor
+  103               | relation_expression
 
-  105 relation_operator: LT_OP
-  106                  | LE_OP
-  107                  | EQ_OP
-  108                  | GE_OP
-  109                  | GT_OP
-  110                  | NE_OP
+  104 relation_expression: arithmetic_expression relation_operator arithmetic_expression
+  105                    | arithmetic_expression
 
-  111 arithmetic_expression: arithmetic_expression add_op term
-  112                      | relation_expression
-  113                      | term
+  106 relation_operator: LT_OP
+  107                  | LE_OP
+  108                  | EQ_OP
+  109                  | GE_OP
+  110                  | GT_OP
+  111                  | NE_OP
 
-  114 add_op: ADD_OP
-  115       | SUB_OP
+  112 arithmetic_expression: arithmetic_expression add_op term
+  113                      | relation_expression
+  114                      | term
 
-  116 term: term mul_op factor
-  117     | factor
+  115 add_op: ADD_OP
+  116       | SUB_OP
 
-  118 mul_op: MUL_OP
-  119       | DIV_OP
-  120       | MOD_OP
+  117 term: term mul_op factor
+  118     | factor
 
-  121 factor: variable_reference
-  122       | SUB_OP variable_reference
-  123       | L_PAREN logical_expression R_PAREN
-  124       | SUB_OP L_PAREN logical_expression R_PAREN
-  125       | ID L_PAREN logical_expression_list R_PAREN
-  126       | SUB_OP ID L_PAREN logical_expression_list R_PAREN
-  127       | ID L_PAREN R_PAREN
-  128       | SUB_OP ID L_PAREN R_PAREN
-  129       | literal_const
+  119 mul_op: MUL_OP
+  120       | DIV_OP
+  121       | MOD_OP
 
-  130 logical_expression_list: logical_expression_list COMMA logical_expression
-  131                        | logical_expression
+  122 factor: variable_reference
+  123       | SUB_OP variable_reference
+  124       | L_PAREN logical_expression R_PAREN
+  125       | SUB_OP L_PAREN logical_expression R_PAREN
+  126       | ID L_PAREN logical_expression_list R_PAREN
+  127       | SUB_OP ID L_PAREN logical_expression_list R_PAREN
+  128       | ID L_PAREN R_PAREN
+  129       | SUB_OP ID L_PAREN R_PAREN
+  130       | literal_const
 
-  132 scalar_type: INT
-  133            | DOUBLE
-  134            | STRING
-  135            | BOOL
-  136            | FLOAT
+  131 logical_expression_list: logical_expression_list COMMA logical_expression
+  132                        | logical_expression
 
-  137 literal_const: INT_CONST
-  138              | SUB_OP INT_CONST
-  139              | FLOAT_CONST
-  140              | SUB_OP FLOAT_CONST
-  141              | SCIENTIFIC
-  142              | SUB_OP SCIENTIFIC
-  143              | STR_CONST
-  144              | TRUE
-  145              | FALSE
+  133 scalar_type: INT
+  134            | DOUBLE
+  135            | STRING
+  136            | BOOL
+  137            | FLOAT
+
+  138 literal_const: INT_CONST
+  139              | SUB_OP INT_CONST
+  140              | FLOAT_CONST
+  141              | SUB_OP FLOAT_CONST
+  142              | SCIENTIFIC
+  143              | SUB_OP SCIENTIFIC
+  144              | STR_CONST
+  145              | TRUE
+  146              | FALSE
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-LE_OP (258) 106
-NE_OP (259) 110
-GE_OP (260) 108
-EQ_OP (261) 107
-AND_OP (262) 99
-OR_OP (263) 97
+LE_OP (258) 107
+NE_OP (259) 111
+GE_OP (260) 109
+EQ_OP (261) 108
+AND_OP (262) 100
+OR_OP (263) 98
 READ (264) 62
 BOOLEAN (265)
-WHILE (266) 68 70
-DO (267) 70
-IF (268) 63 64
-ELSE (269) 64
-TRUE (270) 144
-FALSE (271) 145
-FOR (272) 72
-INT (273) 132
+WHILE (266) 69 71
+DO (267) 71
+IF (268) 63 65
+ELSE (269) 65
+TRUE (270) 145
+FALSE (271) 146
+FOR (272) 73
+INT (273) 133
 PRINT (274) 61
-BOOL (275) 135
+BOOL (275) 136
 VOID (276) 16 18 21 22
-FLOAT (277) 136
-DOUBLE (278) 133
-STRING (279) 134
-CONTINUE (280) 91
-BREAK (281) 92
-RETURN (282) 93
+FLOAT (277) 137
+DOUBLE (278) 134
+STRING (279) 135
+CONTINUE (280) 92
+BREAK (281) 93
+RETURN (282) 94
 CONST (283) 40
-L_PAREN (284) 12 14 16 18 19 20 21 22 63 64 68 70 72 89 90 123 124
-    125 126 127 128
-R_PAREN (285) 12 14 16 18 19 20 21 22 63 64 68 70 72 89 90 123 124
-    125 126 127 128
-COMMA (286) 23 24 28 29 30 31 37 41 73 74 78 79 83 84 130
-SEMICOLON (287) 19 20 21 22 27 40 59 61 62 70 72 89 90 91 92 93
-ML_BRACE (288) 44 45 96
-MR_BRACE (289) 44 45 96
+L_PAREN (284) 12 14 16 18 19 20 21 22 63 65 69 71 73 90 91 124 125
+    126 127 128 129
+R_PAREN (285) 12 14 16 18 19 20 21 22 63 65 69 71 73 90 91 124 125
+    126 127 128 129
+COMMA (286) 23 24 28 29 30 31 37 41 74 75 79 80 84 85 131
+SEMICOLON (287) 19 20 21 22 27 40 59 61 62 71 73 90 91 92 93 94
+ML_BRACE (288) 44 45 97
+MR_BRACE (289) 44 45 97
 L_BRACE (290) 36 47
 R_BRACE (291) 36 47
-ADD_OP (292) 114
-SUB_OP (293) 115 122 124 126 128 138 140 142
-MUL_OP (294) 118
-DIV_OP (295) 119
-MOD_OP (296) 120
-ASSIGN_OP (297) 29 30 32 34 41 42 59 88
-LT_OP (298) 105
-GT_OP (299) 109
-NOT_OP (300) 101
-ID (301) 12 14 16 18 19 20 21 22 23 26 28 29 34 35 41 42 43 89 90 94
-    125 126 127 128
-INT_CONST (302) 44 45 137 138
-FLOAT_CONST (303) 139 140
-SCIENTIFIC (304) 141 142
-STR_CONST (305) 143
+ADD_OP (292) 115
+SUB_OP (293) 116 123 125 127 129 139 141 143
+MUL_OP (294) 119
+DIV_OP (295) 120
+MOD_OP (296) 121
+ASSIGN_OP (297) 29 30 32 34 41 42 59 89
+LT_OP (298) 106
+GT_OP (299) 110
+NOT_OP (300) 102
+ID (301) 12 14 16 18 19 20 21 22 23 26 28 29 34 35 41 42 43 90 91 95
+    126 127 128 129
+INT_CONST (302) 44 45 138 139
+FLOAT_CONST (303) 140 141
+SCIENTIFIC (304) 142 143
+STR_CONST (305) 144
 
 
 Nonterminals, with rules where they appear
@@ -315,7 +318,7 @@ array_decl (68)
 dim (69)
     on left: 44 45, on right: 43 44
 compound_statement (70)
-    on left: 47, on right: 12 14 16 18 52 63 64 68 70 72
+    on left: 47, on right: 12 14 16 18 52 63 65 69 71 73
 $@5 (71)
     on left: 46, on right: 47
 var_const_stmt_list (72)
@@ -327,65 +330,67 @@ simple_statement (74)
 $@6 (75)
     on left: 60, on right: 61
 conditional_statement (76)
-    on left: 63 64, on right: 54
-conditional_if (77)
-    on left: 65, on right: 63 64
-while_statement (78)
-    on left: 68 70, on right: 55
-$@7 (79)
-    on left: 66, on right: 68
+    on left: 63 65, on right: 54
+$@7 (77)
+    on left: 64, on right: 65
+conditional_if (78)
+    on left: 66, on right: 63 65
+while_statement (79)
+    on left: 69 71, on right: 55
 $@8 (80)
-    on left: 67, on right: 68
+    on left: 67, on right: 69
 $@9 (81)
-    on left: 69, on right: 70
-for_statement (82)
-    on left: 72, on right: 56
-$@10 (83)
-    on left: 71, on right: 72
-initial_expression (84)
-    on left: 73 74 75 76 77, on right: 72 73 74
-control_expression (85)
-    on left: 78 79 80 81 82, on right: 72 78 79
-increment_expression (86)
-    on left: 83 84 85 86 87, on right: 72 83 84
-statement_for (87)
-    on left: 88, on right: 73 76 78 81 83 86
-function_invoke_statement (88)
-    on left: 89 90, on right: 57
-jump_statement (89)
-    on left: 91 92 93, on right: 58
-variable_reference (90)
-    on left: 94 95, on right: 59 62 88 95 121 122
-dimension (91)
-    on left: 96, on right: 95
-logical_expression (92)
-    on left: 97 98, on right: 29 34 37 38 59 61 65 68 70 74 75 79 80
-    84 85 88 93 97 123 124 130 131
-logical_term (93)
-    on left: 99 100, on right: 97 98 99
-logical_factor (94)
-    on left: 101 102, on right: 99 100 101
-relation_expression (95)
-    on left: 103 104, on right: 102 112
-relation_operator (96)
-    on left: 105 106 107 108 109 110, on right: 103
-arithmetic_expression (97)
-    on left: 111 112 113, on right: 96 103 104 111
-add_op (98)
-    on left: 114 115, on right: 111
-term (99)
-    on left: 116 117, on right: 111 113 116
-mul_op (100)
-    on left: 118 119 120, on right: 116
-factor (101)
-    on left: 121 122 123 124 125 126 127 128 129, on right: 116 117
-logical_expression_list (102)
-    on left: 130 131, on right: 89 125 126 130
-scalar_type (103)
-    on left: 132 133 134 135 136, on right: 12 14 19 20 23 24 25 26
+    on left: 68, on right: 69
+$@10 (82)
+    on left: 70, on right: 71
+for_statement (83)
+    on left: 73, on right: 56
+$@11 (84)
+    on left: 72, on right: 73
+initial_expression (85)
+    on left: 74 75 76 77 78, on right: 73 74 75
+control_expression (86)
+    on left: 79 80 81 82 83, on right: 73 79 80
+increment_expression (87)
+    on left: 84 85 86 87 88, on right: 73 84 85
+statement_for (88)
+    on left: 89, on right: 74 77 79 82 84 87
+function_invoke_statement (89)
+    on left: 90 91, on right: 57
+jump_statement (90)
+    on left: 92 93 94, on right: 58
+variable_reference (91)
+    on left: 95 96, on right: 59 62 89 96 122 123
+dimension (92)
+    on left: 97, on right: 96
+logical_expression (93)
+    on left: 98 99, on right: 29 34 37 38 59 61 66 69 71 75 76 80 81
+    85 86 89 94 98 124 125 131 132
+logical_term (94)
+    on left: 100 101, on right: 98 99 100
+logical_factor (95)
+    on left: 102 103, on right: 100 101 102
+relation_expression (96)
+    on left: 104 105, on right: 103 113
+relation_operator (97)
+    on left: 106 107 108 109 110 111, on right: 104
+arithmetic_expression (98)
+    on left: 112 113 114, on right: 97 104 105 112
+add_op (99)
+    on left: 115 116, on right: 112
+term (100)
+    on left: 117 118, on right: 112 114 117
+mul_op (101)
+    on left: 119 120 121, on right: 117
+factor (102)
+    on left: 122 123 124 125 126 127 128 129 130, on right: 117 118
+logical_expression_list (103)
+    on left: 131 132, on right: 90 126 127 131
+scalar_type (104)
+    on left: 133 134 135 136 137, on right: 12 14 19 20 23 24 25 26
     27 40
-literal_const (104)
-    on left: 137 138 139 140 141 142 143 144 145, on right: 41 42 129
+literal_const (105)
+    on left: 138 139 140 141 142 143 144 145 146, on right: 41 42 130
 
 
 State 0
@@ -436,16 +441,16 @@ State 3
 
 State 4
 
-  132 scalar_type: INT .
+  133 scalar_type: INT .
 
-    $default  reduce using rule 132 (scalar_type)
+    $default  reduce using rule 133 (scalar_type)
 
 
 State 5
 
-  135 scalar_type: BOOL .
+  136 scalar_type: BOOL .
 
-    $default  reduce using rule 135 (scalar_type)
+    $default  reduce using rule 136 (scalar_type)
 
 
 State 6
@@ -460,23 +465,23 @@ State 6
 
 State 7
 
-  136 scalar_type: FLOAT .
+  137 scalar_type: FLOAT .
 
-    $default  reduce using rule 136 (scalar_type)
+    $default  reduce using rule 137 (scalar_type)
 
 
 State 8
 
-  133 scalar_type: DOUBLE .
+  134 scalar_type: DOUBLE .
 
-    $default  reduce using rule 133 (scalar_type)
+    $default  reduce using rule 134 (scalar_type)
 
 
 State 9
 
-  134 scalar_type: STRING .
+  135 scalar_type: STRING .
 
-    $default  reduce using rule 134 (scalar_type)
+    $default  reduce using rule 135 (scalar_type)
 
 
 State 10
@@ -866,21 +871,21 @@ State 44
 
 State 45
 
-  144 literal_const: TRUE .
-
-    $default  reduce using rule 144 (literal_const)
-
-
-State 46
-
-  145 literal_const: FALSE .
+  145 literal_const: TRUE .
 
     $default  reduce using rule 145 (literal_const)
 
 
+State 46
+
+  146 literal_const: FALSE .
+
+    $default  reduce using rule 146 (literal_const)
+
+
 State 47
 
-  123 factor: L_PAREN . logical_expression R_PAREN
+  124 factor: L_PAREN . logical_expression R_PAREN
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -906,13 +911,13 @@ State 47
 
 State 48
 
-  122 factor: SUB_OP . variable_reference
-  124       | SUB_OP . L_PAREN logical_expression R_PAREN
-  126       | SUB_OP . ID L_PAREN logical_expression_list R_PAREN
-  128       | SUB_OP . ID L_PAREN R_PAREN
-  138 literal_const: SUB_OP . INT_CONST
-  140              | SUB_OP . FLOAT_CONST
-  142              | SUB_OP . SCIENTIFIC
+  123 factor: SUB_OP . variable_reference
+  125       | SUB_OP . L_PAREN logical_expression R_PAREN
+  127       | SUB_OP . ID L_PAREN logical_expression_list R_PAREN
+  129       | SUB_OP . ID L_PAREN R_PAREN
+  139 literal_const: SUB_OP . INT_CONST
+  141              | SUB_OP . FLOAT_CONST
+  143              | SUB_OP . SCIENTIFIC
 
     L_PAREN      shift, and go to state 83
     ID           shift, and go to state 84
@@ -925,7 +930,7 @@ State 48
 
 State 49
 
-  101 logical_factor: NOT_OP . logical_factor
+  102 logical_factor: NOT_OP . logical_factor
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -949,51 +954,51 @@ State 49
 
 State 50
 
-   94 variable_reference: ID .
-  125 factor: ID . L_PAREN logical_expression_list R_PAREN
-  127       | ID . L_PAREN R_PAREN
+   95 variable_reference: ID .
+  126 factor: ID . L_PAREN logical_expression_list R_PAREN
+  128       | ID . L_PAREN R_PAREN
 
     L_PAREN  shift, and go to state 90
 
-    $default  reduce using rule 94 (variable_reference)
+    $default  reduce using rule 95 (variable_reference)
 
 
 State 51
 
-  137 literal_const: INT_CONST .
+  138 literal_const: INT_CONST .
 
-    $default  reduce using rule 137 (literal_const)
+    $default  reduce using rule 138 (literal_const)
 
 
 State 52
 
-  139 literal_const: FLOAT_CONST .
+  140 literal_const: FLOAT_CONST .
 
-    $default  reduce using rule 139 (literal_const)
+    $default  reduce using rule 140 (literal_const)
 
 
 State 53
 
-  141 literal_const: SCIENTIFIC .
+  142 literal_const: SCIENTIFIC .
 
-    $default  reduce using rule 141 (literal_const)
+    $default  reduce using rule 142 (literal_const)
 
 
 State 54
 
-  143 literal_const: STR_CONST .
+  144 literal_const: STR_CONST .
 
-    $default  reduce using rule 143 (literal_const)
+    $default  reduce using rule 144 (literal_const)
 
 
 State 55
 
-   95 variable_reference: variable_reference . dimension
-  121 factor: variable_reference .
+   96 variable_reference: variable_reference . dimension
+  122 factor: variable_reference .
 
     ML_BRACE  shift, and go to state 91
 
-    $default  reduce using rule 121 (factor)
+    $default  reduce using rule 122 (factor)
 
     dimension  go to state 92
 
@@ -1001,7 +1006,7 @@ State 55
 State 56
 
    34 identifier_list: ID ASSIGN_OP logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
@@ -1010,46 +1015,46 @@ State 56
 
 State 57
 
-   98 logical_expression: logical_term .
-   99 logical_term: logical_term . AND_OP logical_factor
+   99 logical_expression: logical_term .
+  100 logical_term: logical_term . AND_OP logical_factor
 
     AND_OP  shift, and go to state 94
 
-    $default  reduce using rule 98 (logical_expression)
+    $default  reduce using rule 99 (logical_expression)
 
 
 State 58
 
-  100 logical_term: logical_factor .
+  101 logical_term: logical_factor .
 
-    $default  reduce using rule 100 (logical_term)
+    $default  reduce using rule 101 (logical_term)
 
 
 State 59
 
-  102 logical_factor: relation_expression .
-  112 arithmetic_expression: relation_expression .
+  103 logical_factor: relation_expression .
+  113 arithmetic_expression: relation_expression .
 
-    AND_OP     reduce using rule 102 (logical_factor)
-    AND_OP     [reduce using rule 112 (arithmetic_expression)]
-    OR_OP      reduce using rule 102 (logical_factor)
-    OR_OP      [reduce using rule 112 (arithmetic_expression)]
-    R_PAREN    reduce using rule 102 (logical_factor)
-    R_PAREN    [reduce using rule 112 (arithmetic_expression)]
-    COMMA      reduce using rule 102 (logical_factor)
-    COMMA      [reduce using rule 112 (arithmetic_expression)]
-    SEMICOLON  reduce using rule 102 (logical_factor)
-    SEMICOLON  [reduce using rule 112 (arithmetic_expression)]
-    R_BRACE    reduce using rule 102 (logical_factor)
-    R_BRACE    [reduce using rule 112 (arithmetic_expression)]
-    $default   reduce using rule 112 (arithmetic_expression)
+    AND_OP     reduce using rule 103 (logical_factor)
+    AND_OP     [reduce using rule 113 (arithmetic_expression)]
+    OR_OP      reduce using rule 103 (logical_factor)
+    OR_OP      [reduce using rule 113 (arithmetic_expression)]
+    R_PAREN    reduce using rule 103 (logical_factor)
+    R_PAREN    [reduce using rule 113 (arithmetic_expression)]
+    COMMA      reduce using rule 103 (logical_factor)
+    COMMA      [reduce using rule 113 (arithmetic_expression)]
+    SEMICOLON  reduce using rule 103 (logical_factor)
+    SEMICOLON  [reduce using rule 113 (arithmetic_expression)]
+    R_BRACE    reduce using rule 103 (logical_factor)
+    R_BRACE    [reduce using rule 113 (arithmetic_expression)]
+    $default   reduce using rule 113 (arithmetic_expression)
 
 
 State 60
 
-  103 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
-  104                    | arithmetic_expression .
-  111 arithmetic_expression: arithmetic_expression . add_op term
+  104 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
+  105                    | arithmetic_expression .
+  112 arithmetic_expression: arithmetic_expression . add_op term
 
     LE_OP   shift, and go to state 95
     NE_OP   shift, and go to state 96
@@ -1060,15 +1065,15 @@ State 60
     LT_OP   shift, and go to state 101
     GT_OP   shift, and go to state 102
 
-    LE_OP     [reduce using rule 104 (relation_expression)]
-    NE_OP     [reduce using rule 104 (relation_expression)]
-    GE_OP     [reduce using rule 104 (relation_expression)]
-    EQ_OP     [reduce using rule 104 (relation_expression)]
-    ADD_OP    [reduce using rule 104 (relation_expression)]
-    SUB_OP    [reduce using rule 104 (relation_expression)]
-    LT_OP     [reduce using rule 104 (relation_expression)]
-    GT_OP     [reduce using rule 104 (relation_expression)]
-    $default  reduce using rule 104 (relation_expression)
+    LE_OP     [reduce using rule 105 (relation_expression)]
+    NE_OP     [reduce using rule 105 (relation_expression)]
+    GE_OP     [reduce using rule 105 (relation_expression)]
+    EQ_OP     [reduce using rule 105 (relation_expression)]
+    ADD_OP    [reduce using rule 105 (relation_expression)]
+    SUB_OP    [reduce using rule 105 (relation_expression)]
+    LT_OP     [reduce using rule 105 (relation_expression)]
+    GT_OP     [reduce using rule 105 (relation_expression)]
+    $default  reduce using rule 105 (relation_expression)
 
     relation_operator  go to state 103
     add_op             go to state 104
@@ -1076,30 +1081,30 @@ State 60
 
 State 61
 
-  113 arithmetic_expression: term .
-  116 term: term . mul_op factor
+  114 arithmetic_expression: term .
+  117 term: term . mul_op factor
 
     MUL_OP  shift, and go to state 105
     DIV_OP  shift, and go to state 106
     MOD_OP  shift, and go to state 107
 
-    $default  reduce using rule 113 (arithmetic_expression)
+    $default  reduce using rule 114 (arithmetic_expression)
 
     mul_op  go to state 108
 
 
 State 62
 
-  117 term: factor .
+  118 term: factor .
 
-    $default  reduce using rule 117 (term)
+    $default  reduce using rule 118 (term)
 
 
 State 63
 
-  129 factor: literal_const .
+  130 factor: literal_const .
 
-    $default  reduce using rule 129 (factor)
+    $default  reduce using rule 130 (factor)
 
 
 State 64
@@ -1233,9 +1238,9 @@ State 74
 
 State 75
 
-  138 literal_const: SUB_OP . INT_CONST
-  140              | SUB_OP . FLOAT_CONST
-  142              | SUB_OP . SCIENTIFIC
+  139 literal_const: SUB_OP . INT_CONST
+  141              | SUB_OP . FLOAT_CONST
+  143              | SUB_OP . SCIENTIFIC
 
     INT_CONST    shift, and go to state 85
     FLOAT_CONST  shift, and go to state 86
@@ -1294,8 +1299,8 @@ State 81
 
 State 82
 
-   97 logical_expression: logical_expression . OR_OP logical_term
-  123 factor: L_PAREN logical_expression . R_PAREN
+   98 logical_expression: logical_expression . OR_OP logical_term
+  124 factor: L_PAREN logical_expression . R_PAREN
 
     OR_OP    shift, and go to state 93
     R_PAREN  shift, and go to state 123
@@ -1303,7 +1308,7 @@ State 82
 
 State 83
 
-  124 factor: SUB_OP L_PAREN . logical_expression R_PAREN
+  125 factor: SUB_OP L_PAREN . logical_expression R_PAREN
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1329,59 +1334,59 @@ State 83
 
 State 84
 
-   94 variable_reference: ID .
-  126 factor: SUB_OP ID . L_PAREN logical_expression_list R_PAREN
-  128       | SUB_OP ID . L_PAREN R_PAREN
+   95 variable_reference: ID .
+  127 factor: SUB_OP ID . L_PAREN logical_expression_list R_PAREN
+  129       | SUB_OP ID . L_PAREN R_PAREN
 
     L_PAREN  shift, and go to state 125
 
-    $default  reduce using rule 94 (variable_reference)
+    $default  reduce using rule 95 (variable_reference)
 
 
 State 85
 
-  138 literal_const: SUB_OP INT_CONST .
+  139 literal_const: SUB_OP INT_CONST .
 
-    $default  reduce using rule 138 (literal_const)
+    $default  reduce using rule 139 (literal_const)
 
 
 State 86
 
-  140 literal_const: SUB_OP FLOAT_CONST .
+  141 literal_const: SUB_OP FLOAT_CONST .
 
-    $default  reduce using rule 140 (literal_const)
+    $default  reduce using rule 141 (literal_const)
 
 
 State 87
 
-  142 literal_const: SUB_OP SCIENTIFIC .
+  143 literal_const: SUB_OP SCIENTIFIC .
 
-    $default  reduce using rule 142 (literal_const)
+    $default  reduce using rule 143 (literal_const)
 
 
 State 88
 
-   95 variable_reference: variable_reference . dimension
-  122 factor: SUB_OP variable_reference .
+   96 variable_reference: variable_reference . dimension
+  123 factor: SUB_OP variable_reference .
 
     ML_BRACE  shift, and go to state 91
 
-    $default  reduce using rule 122 (factor)
+    $default  reduce using rule 123 (factor)
 
     dimension  go to state 92
 
 
 State 89
 
-  101 logical_factor: NOT_OP logical_factor .
+  102 logical_factor: NOT_OP logical_factor .
 
-    $default  reduce using rule 101 (logical_factor)
+    $default  reduce using rule 102 (logical_factor)
 
 
 State 90
 
-  125 factor: ID L_PAREN . logical_expression_list R_PAREN
-  127       | ID L_PAREN . R_PAREN
+  126 factor: ID L_PAREN . logical_expression_list R_PAREN
+  128       | ID L_PAREN . R_PAREN
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1409,7 +1414,7 @@ State 90
 
 State 91
 
-   96 dimension: ML_BRACE . arithmetic_expression MR_BRACE
+   97 dimension: ML_BRACE . arithmetic_expression MR_BRACE
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1431,14 +1436,14 @@ State 91
 
 State 92
 
-   95 variable_reference: variable_reference dimension .
+   96 variable_reference: variable_reference dimension .
 
-    $default  reduce using rule 95 (variable_reference)
+    $default  reduce using rule 96 (variable_reference)
 
 
 State 93
 
-   97 logical_expression: logical_expression OR_OP . logical_term
+   98 logical_expression: logical_expression OR_OP . logical_term
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1463,7 +1468,7 @@ State 93
 
 State 94
 
-   99 logical_term: logical_term AND_OP . logical_factor
+  100 logical_term: logical_term AND_OP . logical_factor
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1487,63 +1492,63 @@ State 94
 
 State 95
 
-  106 relation_operator: LE_OP .
-
-    $default  reduce using rule 106 (relation_operator)
-
-
-State 96
-
-  110 relation_operator: NE_OP .
-
-    $default  reduce using rule 110 (relation_operator)
-
-
-State 97
-
-  108 relation_operator: GE_OP .
-
-    $default  reduce using rule 108 (relation_operator)
-
-
-State 98
-
-  107 relation_operator: EQ_OP .
+  107 relation_operator: LE_OP .
 
     $default  reduce using rule 107 (relation_operator)
 
 
-State 99
+State 96
 
-  114 add_op: ADD_OP .
+  111 relation_operator: NE_OP .
 
-    $default  reduce using rule 114 (add_op)
-
-
-State 100
-
-  115 add_op: SUB_OP .
-
-    $default  reduce using rule 115 (add_op)
+    $default  reduce using rule 111 (relation_operator)
 
 
-State 101
+State 97
 
-  105 relation_operator: LT_OP .
-
-    $default  reduce using rule 105 (relation_operator)
-
-
-State 102
-
-  109 relation_operator: GT_OP .
+  109 relation_operator: GE_OP .
 
     $default  reduce using rule 109 (relation_operator)
 
 
+State 98
+
+  108 relation_operator: EQ_OP .
+
+    $default  reduce using rule 108 (relation_operator)
+
+
+State 99
+
+  115 add_op: ADD_OP .
+
+    $default  reduce using rule 115 (add_op)
+
+
+State 100
+
+  116 add_op: SUB_OP .
+
+    $default  reduce using rule 116 (add_op)
+
+
+State 101
+
+  106 relation_operator: LT_OP .
+
+    $default  reduce using rule 106 (relation_operator)
+
+
+State 102
+
+  110 relation_operator: GT_OP .
+
+    $default  reduce using rule 110 (relation_operator)
+
+
 State 103
 
-  103 relation_expression: arithmetic_expression relation_operator . arithmetic_expression
+  104 relation_expression: arithmetic_expression relation_operator . arithmetic_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1565,7 +1570,7 @@ State 103
 
 State 104
 
-  111 arithmetic_expression: arithmetic_expression add_op . term
+  112 arithmetic_expression: arithmetic_expression add_op . term
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1585,28 +1590,28 @@ State 104
 
 State 105
 
-  118 mul_op: MUL_OP .
-
-    $default  reduce using rule 118 (mul_op)
-
-
-State 106
-
-  119 mul_op: DIV_OP .
+  119 mul_op: MUL_OP .
 
     $default  reduce using rule 119 (mul_op)
 
 
-State 107
+State 106
 
-  120 mul_op: MOD_OP .
+  120 mul_op: DIV_OP .
 
     $default  reduce using rule 120 (mul_op)
 
 
+State 107
+
+  121 mul_op: MOD_OP .
+
+    $default  reduce using rule 121 (mul_op)
+
+
 State 108
 
-  116 term: term mul_op . factor
+  117 term: term mul_op . factor
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1677,7 +1682,7 @@ State 112
 State 113
 
    38 literal_list: logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
@@ -1766,15 +1771,15 @@ State 122
 
 State 123
 
-  123 factor: L_PAREN logical_expression R_PAREN .
+  124 factor: L_PAREN logical_expression R_PAREN .
 
-    $default  reduce using rule 123 (factor)
+    $default  reduce using rule 124 (factor)
 
 
 State 124
 
-   97 logical_expression: logical_expression . OR_OP logical_term
-  124 factor: SUB_OP L_PAREN logical_expression . R_PAREN
+   98 logical_expression: logical_expression . OR_OP logical_term
+  125 factor: SUB_OP L_PAREN logical_expression . R_PAREN
 
     OR_OP    shift, and go to state 93
     R_PAREN  shift, and go to state 147
@@ -1782,8 +1787,8 @@ State 124
 
 State 125
 
-  126 factor: SUB_OP ID L_PAREN . logical_expression_list R_PAREN
-  128       | SUB_OP ID L_PAREN . R_PAREN
+  127 factor: SUB_OP ID L_PAREN . logical_expression_list R_PAREN
+  129       | SUB_OP ID L_PAREN . R_PAREN
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -1811,25 +1816,25 @@ State 125
 
 State 126
 
-  127 factor: ID L_PAREN R_PAREN .
+  128 factor: ID L_PAREN R_PAREN .
 
-    $default  reduce using rule 127 (factor)
+    $default  reduce using rule 128 (factor)
 
 
 State 127
 
-   97 logical_expression: logical_expression . OR_OP logical_term
-  131 logical_expression_list: logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
+  132 logical_expression_list: logical_expression .
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 131 (logical_expression_list)
+    $default  reduce using rule 132 (logical_expression_list)
 
 
 State 128
 
-  125 factor: ID L_PAREN logical_expression_list . R_PAREN
-  130 logical_expression_list: logical_expression_list . COMMA logical_expression
+  126 factor: ID L_PAREN logical_expression_list . R_PAREN
+  131 logical_expression_list: logical_expression_list . COMMA logical_expression
 
     R_PAREN  shift, and go to state 150
     COMMA    shift, and go to state 151
@@ -1837,17 +1842,17 @@ State 128
 
 State 129
 
-  112 arithmetic_expression: relation_expression .
+  113 arithmetic_expression: relation_expression .
 
-    $default  reduce using rule 112 (arithmetic_expression)
+    $default  reduce using rule 113 (arithmetic_expression)
 
 
 State 130
 
-   96 dimension: ML_BRACE arithmetic_expression . MR_BRACE
-  103 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
-  104                    | arithmetic_expression .
-  111 arithmetic_expression: arithmetic_expression . add_op term
+   97 dimension: ML_BRACE arithmetic_expression . MR_BRACE
+  104 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
+  105                    | arithmetic_expression .
+  112 arithmetic_expression: arithmetic_expression . add_op term
 
     LE_OP     shift, and go to state 95
     NE_OP     shift, and go to state 96
@@ -1859,15 +1864,15 @@ State 130
     LT_OP     shift, and go to state 101
     GT_OP     shift, and go to state 102
 
-    LE_OP     [reduce using rule 104 (relation_expression)]
-    NE_OP     [reduce using rule 104 (relation_expression)]
-    GE_OP     [reduce using rule 104 (relation_expression)]
-    EQ_OP     [reduce using rule 104 (relation_expression)]
-    MR_BRACE  [reduce using rule 104 (relation_expression)]
-    ADD_OP    [reduce using rule 104 (relation_expression)]
-    SUB_OP    [reduce using rule 104 (relation_expression)]
-    LT_OP     [reduce using rule 104 (relation_expression)]
-    GT_OP     [reduce using rule 104 (relation_expression)]
+    LE_OP     [reduce using rule 105 (relation_expression)]
+    NE_OP     [reduce using rule 105 (relation_expression)]
+    GE_OP     [reduce using rule 105 (relation_expression)]
+    EQ_OP     [reduce using rule 105 (relation_expression)]
+    MR_BRACE  [reduce using rule 105 (relation_expression)]
+    ADD_OP    [reduce using rule 105 (relation_expression)]
+    SUB_OP    [reduce using rule 105 (relation_expression)]
+    LT_OP     [reduce using rule 105 (relation_expression)]
+    GT_OP     [reduce using rule 105 (relation_expression)]
 
     relation_operator  go to state 103
     add_op             go to state 104
@@ -1875,27 +1880,27 @@ State 130
 
 State 131
 
-   97 logical_expression: logical_expression OR_OP logical_term .
-   99 logical_term: logical_term . AND_OP logical_factor
+   98 logical_expression: logical_expression OR_OP logical_term .
+  100 logical_term: logical_term . AND_OP logical_factor
 
     AND_OP  shift, and go to state 94
 
-    $default  reduce using rule 97 (logical_expression)
+    $default  reduce using rule 98 (logical_expression)
 
 
 State 132
 
-   99 logical_term: logical_term AND_OP logical_factor .
+  100 logical_term: logical_term AND_OP logical_factor .
 
-    $default  reduce using rule 99 (logical_term)
+    $default  reduce using rule 100 (logical_term)
 
 
 State 133
 
-  103 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
-  103                    | arithmetic_expression relation_operator arithmetic_expression .
-  104                    | arithmetic_expression .
-  111 arithmetic_expression: arithmetic_expression . add_op term
+  104 relation_expression: arithmetic_expression . relation_operator arithmetic_expression
+  104                    | arithmetic_expression relation_operator arithmetic_expression .
+  105                    | arithmetic_expression .
+  112 arithmetic_expression: arithmetic_expression . add_op term
 
     LE_OP   shift, and go to state 95
     NE_OP   shift, and go to state 96
@@ -1906,37 +1911,37 @@ State 133
     LT_OP   shift, and go to state 101
     GT_OP   shift, and go to state 102
 
-    LE_OP      [reduce using rule 103 (relation_expression)]
     LE_OP      [reduce using rule 104 (relation_expression)]
-    NE_OP      [reduce using rule 103 (relation_expression)]
+    LE_OP      [reduce using rule 105 (relation_expression)]
     NE_OP      [reduce using rule 104 (relation_expression)]
-    GE_OP      [reduce using rule 103 (relation_expression)]
+    NE_OP      [reduce using rule 105 (relation_expression)]
     GE_OP      [reduce using rule 104 (relation_expression)]
-    EQ_OP      [reduce using rule 103 (relation_expression)]
+    GE_OP      [reduce using rule 105 (relation_expression)]
     EQ_OP      [reduce using rule 104 (relation_expression)]
-    AND_OP     reduce using rule 103 (relation_expression)
-    AND_OP     [reduce using rule 104 (relation_expression)]
-    OR_OP      reduce using rule 103 (relation_expression)
-    OR_OP      [reduce using rule 104 (relation_expression)]
-    R_PAREN    reduce using rule 103 (relation_expression)
-    R_PAREN    [reduce using rule 104 (relation_expression)]
-    COMMA      reduce using rule 103 (relation_expression)
-    COMMA      [reduce using rule 104 (relation_expression)]
-    SEMICOLON  reduce using rule 103 (relation_expression)
-    SEMICOLON  [reduce using rule 104 (relation_expression)]
-    MR_BRACE   reduce using rule 103 (relation_expression)
-    MR_BRACE   [reduce using rule 104 (relation_expression)]
-    R_BRACE    reduce using rule 103 (relation_expression)
-    R_BRACE    [reduce using rule 104 (relation_expression)]
-    ADD_OP     [reduce using rule 103 (relation_expression)]
+    EQ_OP      [reduce using rule 105 (relation_expression)]
+    AND_OP     reduce using rule 104 (relation_expression)
+    AND_OP     [reduce using rule 105 (relation_expression)]
+    OR_OP      reduce using rule 104 (relation_expression)
+    OR_OP      [reduce using rule 105 (relation_expression)]
+    R_PAREN    reduce using rule 104 (relation_expression)
+    R_PAREN    [reduce using rule 105 (relation_expression)]
+    COMMA      reduce using rule 104 (relation_expression)
+    COMMA      [reduce using rule 105 (relation_expression)]
+    SEMICOLON  reduce using rule 104 (relation_expression)
+    SEMICOLON  [reduce using rule 105 (relation_expression)]
+    MR_BRACE   reduce using rule 104 (relation_expression)
+    MR_BRACE   [reduce using rule 105 (relation_expression)]
+    R_BRACE    reduce using rule 104 (relation_expression)
+    R_BRACE    [reduce using rule 105 (relation_expression)]
     ADD_OP     [reduce using rule 104 (relation_expression)]
-    SUB_OP     [reduce using rule 103 (relation_expression)]
+    ADD_OP     [reduce using rule 105 (relation_expression)]
     SUB_OP     [reduce using rule 104 (relation_expression)]
-    LT_OP      [reduce using rule 103 (relation_expression)]
+    SUB_OP     [reduce using rule 105 (relation_expression)]
     LT_OP      [reduce using rule 104 (relation_expression)]
-    GT_OP      [reduce using rule 103 (relation_expression)]
+    LT_OP      [reduce using rule 105 (relation_expression)]
     GT_OP      [reduce using rule 104 (relation_expression)]
-    $default   reduce using rule 103 (relation_expression)
+    GT_OP      [reduce using rule 105 (relation_expression)]
+    $default   reduce using rule 104 (relation_expression)
 
     relation_operator  go to state 103
     add_op             go to state 104
@@ -1944,23 +1949,23 @@ State 133
 
 State 134
 
-  111 arithmetic_expression: arithmetic_expression add_op term .
-  116 term: term . mul_op factor
+  112 arithmetic_expression: arithmetic_expression add_op term .
+  117 term: term . mul_op factor
 
     MUL_OP  shift, and go to state 105
     DIV_OP  shift, and go to state 106
     MOD_OP  shift, and go to state 107
 
-    $default  reduce using rule 111 (arithmetic_expression)
+    $default  reduce using rule 112 (arithmetic_expression)
 
     mul_op  go to state 108
 
 
 State 135
 
-  116 term: term mul_op factor .
+  117 term: term mul_op factor .
 
-    $default  reduce using rule 116 (term)
+    $default  reduce using rule 117 (term)
 
 
 State 136
@@ -1973,7 +1978,7 @@ State 136
 State 137
 
    29 identifier_list: identifier_list COMMA ID ASSIGN_OP logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
@@ -2071,22 +2076,22 @@ State 146
 
 State 147
 
-  124 factor: SUB_OP L_PAREN logical_expression R_PAREN .
+  125 factor: SUB_OP L_PAREN logical_expression R_PAREN .
 
-    $default  reduce using rule 124 (factor)
+    $default  reduce using rule 125 (factor)
 
 
 State 148
 
-  128 factor: SUB_OP ID L_PAREN R_PAREN .
+  129 factor: SUB_OP ID L_PAREN R_PAREN .
 
-    $default  reduce using rule 128 (factor)
+    $default  reduce using rule 129 (factor)
 
 
 State 149
 
-  126 factor: SUB_OP ID L_PAREN logical_expression_list . R_PAREN
-  130 logical_expression_list: logical_expression_list . COMMA logical_expression
+  127 factor: SUB_OP ID L_PAREN logical_expression_list . R_PAREN
+  131 logical_expression_list: logical_expression_list . COMMA logical_expression
 
     R_PAREN  shift, and go to state 155
     COMMA    shift, and go to state 151
@@ -2094,14 +2099,14 @@ State 149
 
 State 150
 
-  125 factor: ID L_PAREN logical_expression_list R_PAREN .
+  126 factor: ID L_PAREN logical_expression_list R_PAREN .
 
-    $default  reduce using rule 125 (factor)
+    $default  reduce using rule 126 (factor)
 
 
 State 151
 
-  130 logical_expression_list: logical_expression_list COMMA . logical_expression
+  131 logical_expression_list: logical_expression_list COMMA . logical_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2127,15 +2132,15 @@ State 151
 
 State 152
 
-   96 dimension: ML_BRACE arithmetic_expression MR_BRACE .
+   97 dimension: ML_BRACE arithmetic_expression MR_BRACE .
 
-    $default  reduce using rule 96 (dimension)
+    $default  reduce using rule 97 (dimension)
 
 
 State 153
 
    37 literal_list: literal_list COMMA logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
@@ -2166,7 +2171,7 @@ State 154
     R_BRACE   shift, and go to state 165
     ID        shift, and go to state 166
 
-    DO        reduce using rule 69 ($@9)
+    DO        reduce using rule 70 ($@10)
     $default  reduce using rule 46 ($@5)
 
     var_decl                   go to state 167
@@ -2177,7 +2182,7 @@ State 154
     simple_statement           go to state 171
     conditional_statement      go to state 172
     while_statement            go to state 173
-    $@9                        go to state 174
+    $@10                       go to state 174
     for_statement              go to state 175
     function_invoke_statement  go to state 176
     jump_statement             go to state 177
@@ -2187,19 +2192,19 @@ State 154
 
 State 155
 
-  126 factor: SUB_OP ID L_PAREN logical_expression_list R_PAREN .
+  127 factor: SUB_OP ID L_PAREN logical_expression_list R_PAREN .
 
-    $default  reduce using rule 126 (factor)
+    $default  reduce using rule 127 (factor)
 
 
 State 156
 
-   97 logical_expression: logical_expression . OR_OP logical_term
-  130 logical_expression_list: logical_expression_list COMMA logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
+  131 logical_expression_list: logical_expression_list COMMA logical_expression .
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 130 (logical_expression_list)
+    $default  reduce using rule 131 (logical_expression_list)
 
 
 State 157
@@ -2213,7 +2218,7 @@ State 157
 
 State 158
 
-   68 while_statement: WHILE . L_PAREN logical_expression $@7 R_PAREN $@8 compound_statement
+   69 while_statement: WHILE . L_PAREN logical_expression $@8 R_PAREN $@9 compound_statement
 
     L_PAREN  shift, and go to state 182
 
@@ -2221,14 +2226,14 @@ State 158
 State 159
 
    63 conditional_statement: IF . L_PAREN conditional_if R_PAREN compound_statement
-   64                      | IF . L_PAREN conditional_if R_PAREN compound_statement ELSE compound_statement
+   65                      | IF . L_PAREN conditional_if R_PAREN compound_statement $@7 ELSE compound_statement
 
     L_PAREN  shift, and go to state 183
 
 
 State 160
 
-   72 for_statement: FOR . L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement
+   73 for_statement: FOR . L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement
 
     L_PAREN  shift, and go to state 184
 
@@ -2244,21 +2249,21 @@ State 161
 
 State 162
 
-   91 jump_statement: CONTINUE . SEMICOLON
+   92 jump_statement: CONTINUE . SEMICOLON
 
     SEMICOLON  shift, and go to state 186
 
 
 State 163
 
-   92 jump_statement: BREAK . SEMICOLON
+   93 jump_statement: BREAK . SEMICOLON
 
     SEMICOLON  shift, and go to state 187
 
 
 State 164
 
-   93 jump_statement: RETURN . logical_expression SEMICOLON
+   94 jump_statement: RETURN . logical_expression SEMICOLON
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2291,13 +2296,13 @@ State 165
 
 State 166
 
-   89 function_invoke_statement: ID . L_PAREN logical_expression_list R_PAREN SEMICOLON
-   90                          | ID . L_PAREN R_PAREN SEMICOLON
-   94 variable_reference: ID .
+   90 function_invoke_statement: ID . L_PAREN logical_expression_list R_PAREN SEMICOLON
+   91                          | ID . L_PAREN R_PAREN SEMICOLON
+   95 variable_reference: ID .
 
     L_PAREN  shift, and go to state 189
 
-    $default  reduce using rule 94 (variable_reference)
+    $default  reduce using rule 95 (variable_reference)
 
 
 State 167
@@ -2351,7 +2356,7 @@ State 173
 
 State 174
 
-   70 while_statement: $@9 . DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
+   71 while_statement: $@10 . DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
 
     DO  shift, and go to state 190
 
@@ -2380,7 +2385,7 @@ State 177
 State 178
 
    59 simple_statement: variable_reference . ASSIGN_OP logical_expression SEMICOLON
-   95 variable_reference: variable_reference . dimension
+   96 variable_reference: variable_reference . dimension
 
     ML_BRACE   shift, and go to state 91
     ASSIGN_OP  shift, and go to state 191
@@ -2400,15 +2405,15 @@ State 179
 
 State 180
 
-   94 variable_reference: ID .
+   95 variable_reference: ID .
 
-    $default  reduce using rule 94 (variable_reference)
+    $default  reduce using rule 95 (variable_reference)
 
 
 State 181
 
    62 simple_statement: READ variable_reference . SEMICOLON
-   95 variable_reference: variable_reference . dimension
+   96 variable_reference: variable_reference . dimension
 
     SEMICOLON  shift, and go to state 193
     ML_BRACE   shift, and go to state 91
@@ -2418,7 +2423,7 @@ State 181
 
 State 182
 
-   68 while_statement: WHILE L_PAREN . logical_expression $@7 R_PAREN $@8 compound_statement
+   69 while_statement: WHILE L_PAREN . logical_expression $@8 R_PAREN $@9 compound_statement
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2445,7 +2450,7 @@ State 182
 State 183
 
    63 conditional_statement: IF L_PAREN . conditional_if R_PAREN compound_statement
-   64                      | IF L_PAREN . conditional_if R_PAREN compound_statement ELSE compound_statement
+   65                      | IF L_PAREN . conditional_if R_PAREN compound_statement $@7 ELSE compound_statement
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2472,7 +2477,7 @@ State 183
 
 State 184
 
-   72 for_statement: FOR L_PAREN . initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement
+   73 for_statement: FOR L_PAREN . initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2485,7 +2490,7 @@ State 184
     SCIENTIFIC   shift, and go to state 53
     STR_CONST    shift, and go to state 54
 
-    $default  reduce using rule 77 (initial_expression)
+    $default  reduce using rule 78 (initial_expression)
 
     initial_expression     go to state 197
     statement_for          go to state 198
@@ -2528,22 +2533,22 @@ State 185
 
 State 186
 
-   91 jump_statement: CONTINUE SEMICOLON .
-
-    $default  reduce using rule 91 (jump_statement)
-
-
-State 187
-
-   92 jump_statement: BREAK SEMICOLON .
+   92 jump_statement: CONTINUE SEMICOLON .
 
     $default  reduce using rule 92 (jump_statement)
 
 
+State 187
+
+   93 jump_statement: BREAK SEMICOLON .
+
+    $default  reduce using rule 93 (jump_statement)
+
+
 State 188
 
-   93 jump_statement: RETURN logical_expression . SEMICOLON
-   97 logical_expression: logical_expression . OR_OP logical_term
+   94 jump_statement: RETURN logical_expression . SEMICOLON
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP      shift, and go to state 93
     SEMICOLON  shift, and go to state 202
@@ -2551,8 +2556,8 @@ State 188
 
 State 189
 
-   89 function_invoke_statement: ID L_PAREN . logical_expression_list R_PAREN SEMICOLON
-   90                          | ID L_PAREN . R_PAREN SEMICOLON
+   90 function_invoke_statement: ID L_PAREN . logical_expression_list R_PAREN SEMICOLON
+   91                          | ID L_PAREN . R_PAREN SEMICOLON
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2580,7 +2585,7 @@ State 189
 
 State 190
 
-   70 while_statement: $@9 DO . compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
+   71 while_statement: $@10 DO . compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
 
     $default  reduce using rule 46 ($@5)
 
@@ -2637,39 +2642,39 @@ State 193
 
 State 194
 
-   68 while_statement: WHILE L_PAREN logical_expression . $@7 R_PAREN $@8 compound_statement
-   97 logical_expression: logical_expression . OR_OP logical_term
+   69 while_statement: WHILE L_PAREN logical_expression . $@8 R_PAREN $@9 compound_statement
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 66 ($@7)
+    $default  reduce using rule 67 ($@8)
 
-    $@7  go to state 207
+    $@8  go to state 207
 
 
 State 195
 
    63 conditional_statement: IF L_PAREN conditional_if . R_PAREN compound_statement
-   64                      | IF L_PAREN conditional_if . R_PAREN compound_statement ELSE compound_statement
+   65                      | IF L_PAREN conditional_if . R_PAREN compound_statement $@7 ELSE compound_statement
 
     R_PAREN  shift, and go to state 208
 
 
 State 196
 
-   65 conditional_if: logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   66 conditional_if: logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 65 (conditional_if)
+    $default  reduce using rule 66 (conditional_if)
 
 
 State 197
 
-   72 for_statement: FOR L_PAREN initial_expression . SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement
-   73 initial_expression: initial_expression . COMMA statement_for
-   74                   | initial_expression . COMMA logical_expression
+   73 for_statement: FOR L_PAREN initial_expression . SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement
+   74 initial_expression: initial_expression . COMMA statement_for
+   75                   | initial_expression . COMMA logical_expression
 
     COMMA      shift, and go to state 209
     SEMICOLON  shift, and go to state 210
@@ -2677,39 +2682,39 @@ State 197
 
 State 198
 
-   76 initial_expression: statement_for .
+   77 initial_expression: statement_for .
 
-    $default  reduce using rule 76 (initial_expression)
+    $default  reduce using rule 77 (initial_expression)
 
 
 State 199
 
-   88 statement_for: variable_reference . ASSIGN_OP logical_expression
-   95 variable_reference: variable_reference . dimension
-  121 factor: variable_reference .
+   89 statement_for: variable_reference . ASSIGN_OP logical_expression
+   96 variable_reference: variable_reference . dimension
+  122 factor: variable_reference .
 
     ML_BRACE   shift, and go to state 91
     ASSIGN_OP  shift, and go to state 211
 
-    $default  reduce using rule 121 (factor)
+    $default  reduce using rule 122 (factor)
 
     dimension  go to state 92
 
 
 State 200
 
-   75 initial_expression: logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   76 initial_expression: logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 75 (initial_expression)
+    $default  reduce using rule 76 (initial_expression)
 
 
 State 201
 
    61 simple_statement: PRINT $@6 logical_expression . SEMICOLON
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP      shift, and go to state 93
     SEMICOLON  shift, and go to state 212
@@ -2717,22 +2722,22 @@ State 201
 
 State 202
 
-   93 jump_statement: RETURN logical_expression SEMICOLON .
+   94 jump_statement: RETURN logical_expression SEMICOLON .
 
-    $default  reduce using rule 93 (jump_statement)
+    $default  reduce using rule 94 (jump_statement)
 
 
 State 203
 
-   90 function_invoke_statement: ID L_PAREN R_PAREN . SEMICOLON
+   91 function_invoke_statement: ID L_PAREN R_PAREN . SEMICOLON
 
     SEMICOLON  shift, and go to state 213
 
 
 State 204
 
-   89 function_invoke_statement: ID L_PAREN logical_expression_list . R_PAREN SEMICOLON
-  130 logical_expression_list: logical_expression_list . COMMA logical_expression
+   90 function_invoke_statement: ID L_PAREN logical_expression_list . R_PAREN SEMICOLON
+  131 logical_expression_list: logical_expression_list . COMMA logical_expression
 
     R_PAREN  shift, and go to state 214
     COMMA    shift, and go to state 151
@@ -2740,7 +2745,7 @@ State 204
 
 State 205
 
-   70 while_statement: $@9 DO compound_statement . WHILE L_PAREN logical_expression R_PAREN SEMICOLON
+   71 while_statement: $@10 DO compound_statement . WHILE L_PAREN logical_expression R_PAREN SEMICOLON
 
     WHILE  shift, and go to state 215
 
@@ -2748,7 +2753,7 @@ State 205
 State 206
 
    59 simple_statement: variable_reference ASSIGN_OP logical_expression . SEMICOLON
-   97 logical_expression: logical_expression . OR_OP logical_term
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP      shift, and go to state 93
     SEMICOLON  shift, and go to state 216
@@ -2756,7 +2761,7 @@ State 206
 
 State 207
 
-   68 while_statement: WHILE L_PAREN logical_expression $@7 . R_PAREN $@8 compound_statement
+   69 while_statement: WHILE L_PAREN logical_expression $@8 . R_PAREN $@9 compound_statement
 
     R_PAREN  shift, and go to state 217
 
@@ -2764,7 +2769,7 @@ State 207
 State 208
 
    63 conditional_statement: IF L_PAREN conditional_if R_PAREN . compound_statement
-   64                      | IF L_PAREN conditional_if R_PAREN . compound_statement ELSE compound_statement
+   65                      | IF L_PAREN conditional_if R_PAREN . compound_statement $@7 ELSE compound_statement
 
     $default  reduce using rule 46 ($@5)
 
@@ -2774,8 +2779,8 @@ State 208
 
 State 209
 
-   73 initial_expression: initial_expression COMMA . statement_for
-   74                   | initial_expression COMMA . logical_expression
+   74 initial_expression: initial_expression COMMA . statement_for
+   75                   | initial_expression COMMA . logical_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2802,7 +2807,7 @@ State 209
 
 State 210
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON . control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON . control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2815,7 +2820,7 @@ State 210
     SCIENTIFIC   shift, and go to state 53
     STR_CONST    shift, and go to state 54
 
-    $default  reduce using rule 82 (control_expression)
+    $default  reduce using rule 83 (control_expression)
 
     control_expression     go to state 221
     statement_for          go to state 222
@@ -2832,7 +2837,7 @@ State 210
 
 State 211
 
-   88 statement_for: variable_reference ASSIGN_OP . logical_expression
+   89 statement_for: variable_reference ASSIGN_OP . logical_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2865,21 +2870,21 @@ State 212
 
 State 213
 
-   90 function_invoke_statement: ID L_PAREN R_PAREN SEMICOLON .
+   91 function_invoke_statement: ID L_PAREN R_PAREN SEMICOLON .
 
-    $default  reduce using rule 90 (function_invoke_statement)
+    $default  reduce using rule 91 (function_invoke_statement)
 
 
 State 214
 
-   89 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN . SEMICOLON
+   90 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN . SEMICOLON
 
     SEMICOLON  shift, and go to state 225
 
 
 State 215
 
-   70 while_statement: $@9 DO compound_statement WHILE . L_PAREN logical_expression R_PAREN SEMICOLON
+   71 while_statement: $@10 DO compound_statement WHILE . L_PAREN logical_expression R_PAREN SEMICOLON
 
     L_PAREN  shift, and go to state 226
 
@@ -2893,45 +2898,46 @@ State 216
 
 State 217
 
-   68 while_statement: WHILE L_PAREN logical_expression $@7 R_PAREN . $@8 compound_statement
+   69 while_statement: WHILE L_PAREN logical_expression $@8 R_PAREN . $@9 compound_statement
 
-    $default  reduce using rule 67 ($@8)
+    $default  reduce using rule 68 ($@9)
 
-    $@8  go to state 227
+    $@9  go to state 227
 
 
 State 218
 
    63 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement .
-   64                      | IF L_PAREN conditional_if R_PAREN compound_statement . ELSE compound_statement
+   65                      | IF L_PAREN conditional_if R_PAREN compound_statement . $@7 ELSE compound_statement
 
-    ELSE  shift, and go to state 228
-
+    ELSE      reduce using rule 64 ($@7)
     $default  reduce using rule 63 (conditional_statement)
+
+    $@7  go to state 228
 
 
 State 219
 
-   73 initial_expression: initial_expression COMMA statement_for .
-
-    $default  reduce using rule 73 (initial_expression)
-
-
-State 220
-
-   74 initial_expression: initial_expression COMMA logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
-
-    OR_OP  shift, and go to state 93
+   74 initial_expression: initial_expression COMMA statement_for .
 
     $default  reduce using rule 74 (initial_expression)
 
 
+State 220
+
+   75 initial_expression: initial_expression COMMA logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
+
+    OR_OP  shift, and go to state 93
+
+    $default  reduce using rule 75 (initial_expression)
+
+
 State 221
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression . SEMICOLON increment_expression R_PAREN $@10 compound_statement
-   78 control_expression: control_expression . COMMA statement_for
-   79                   | control_expression . COMMA logical_expression
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression . SEMICOLON increment_expression R_PAREN $@11 compound_statement
+   79 control_expression: control_expression . COMMA statement_for
+   80                   | control_expression . COMMA logical_expression
 
     COMMA      shift, and go to state 229
     SEMICOLON  shift, and go to state 230
@@ -2939,41 +2945,41 @@ State 221
 
 State 222
 
-   81 control_expression: statement_for .
+   82 control_expression: statement_for .
 
-    $default  reduce using rule 81 (control_expression)
+    $default  reduce using rule 82 (control_expression)
 
 
 State 223
 
-   80 control_expression: logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   81 control_expression: logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 80 (control_expression)
+    $default  reduce using rule 81 (control_expression)
 
 
 State 224
 
-   88 statement_for: variable_reference ASSIGN_OP logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   89 statement_for: variable_reference ASSIGN_OP logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 88 (statement_for)
+    $default  reduce using rule 89 (statement_for)
 
 
 State 225
 
-   89 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN SEMICOLON .
+   90 function_invoke_statement: ID L_PAREN logical_expression_list R_PAREN SEMICOLON .
 
-    $default  reduce using rule 89 (function_invoke_statement)
+    $default  reduce using rule 90 (function_invoke_statement)
 
 
 State 226
 
-   70 while_statement: $@9 DO compound_statement WHILE L_PAREN . logical_expression R_PAREN SEMICOLON
+   71 while_statement: $@10 DO compound_statement WHILE L_PAREN . logical_expression R_PAREN SEMICOLON
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -2999,7 +3005,7 @@ State 226
 
 State 227
 
-   68 while_statement: WHILE L_PAREN logical_expression $@7 R_PAREN $@8 . compound_statement
+   69 while_statement: WHILE L_PAREN logical_expression $@8 R_PAREN $@9 . compound_statement
 
     $default  reduce using rule 46 ($@5)
 
@@ -3009,18 +3015,15 @@ State 227
 
 State 228
 
-   64 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement ELSE . compound_statement
+   65 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement $@7 . ELSE compound_statement
 
-    $default  reduce using rule 46 ($@5)
-
-    compound_statement  go to state 233
-    $@5                 go to state 115
+    ELSE  shift, and go to state 233
 
 
 State 229
 
-   78 control_expression: control_expression COMMA . statement_for
-   79                   | control_expression COMMA . logical_expression
+   79 control_expression: control_expression COMMA . statement_for
+   80                   | control_expression COMMA . logical_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -3047,7 +3050,7 @@ State 229
 
 State 230
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON . increment_expression R_PAREN $@10 compound_statement
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON . increment_expression R_PAREN $@11 compound_statement
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -3060,7 +3063,7 @@ State 230
     SCIENTIFIC   shift, and go to state 53
     STR_CONST    shift, and go to state 54
 
-    $default  reduce using rule 87 (increment_expression)
+    $default  reduce using rule 88 (increment_expression)
 
     increment_expression   go to state 236
     statement_for          go to state 237
@@ -3077,8 +3080,8 @@ State 230
 
 State 231
 
-   70 while_statement: $@9 DO compound_statement WHILE L_PAREN logical_expression . R_PAREN SEMICOLON
-   97 logical_expression: logical_expression . OR_OP logical_term
+   71 while_statement: $@10 DO compound_statement WHILE L_PAREN logical_expression . R_PAREN SEMICOLON
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP    shift, and go to state 93
     R_PAREN  shift, and go to state 239
@@ -3086,82 +3089,92 @@ State 231
 
 State 232
 
-   68 while_statement: WHILE L_PAREN logical_expression $@7 R_PAREN $@8 compound_statement .
+   69 while_statement: WHILE L_PAREN logical_expression $@8 R_PAREN $@9 compound_statement .
 
-    $default  reduce using rule 68 (while_statement)
+    $default  reduce using rule 69 (while_statement)
 
 
 State 233
 
-   64 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement ELSE compound_statement .
+   65 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement $@7 ELSE . compound_statement
 
-    $default  reduce using rule 64 (conditional_statement)
+    $default  reduce using rule 46 ($@5)
+
+    compound_statement  go to state 240
+    $@5                 go to state 115
 
 
 State 234
 
-   78 control_expression: control_expression COMMA statement_for .
-
-    $default  reduce using rule 78 (control_expression)
-
-
-State 235
-
-   79 control_expression: control_expression COMMA logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
-
-    OR_OP  shift, and go to state 93
+   79 control_expression: control_expression COMMA statement_for .
 
     $default  reduce using rule 79 (control_expression)
 
 
+State 235
+
+   80 control_expression: control_expression COMMA logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
+
+    OR_OP  shift, and go to state 93
+
+    $default  reduce using rule 80 (control_expression)
+
+
 State 236
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression . R_PAREN $@10 compound_statement
-   83 increment_expression: increment_expression . COMMA statement_for
-   84                     | increment_expression . COMMA logical_expression
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression . R_PAREN $@11 compound_statement
+   84 increment_expression: increment_expression . COMMA statement_for
+   85                     | increment_expression . COMMA logical_expression
 
-    R_PAREN  shift, and go to state 240
-    COMMA    shift, and go to state 241
+    R_PAREN  shift, and go to state 241
+    COMMA    shift, and go to state 242
 
 
 State 237
 
-   86 increment_expression: statement_for .
+   87 increment_expression: statement_for .
 
-    $default  reduce using rule 86 (increment_expression)
+    $default  reduce using rule 87 (increment_expression)
 
 
 State 238
 
-   85 increment_expression: logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
+   86 increment_expression: logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
     OR_OP  shift, and go to state 93
 
-    $default  reduce using rule 85 (increment_expression)
+    $default  reduce using rule 86 (increment_expression)
 
 
 State 239
 
-   70 while_statement: $@9 DO compound_statement WHILE L_PAREN logical_expression R_PAREN . SEMICOLON
+   71 while_statement: $@10 DO compound_statement WHILE L_PAREN logical_expression R_PAREN . SEMICOLON
 
-    SEMICOLON  shift, and go to state 242
+    SEMICOLON  shift, and go to state 243
 
 
 State 240
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN . $@10 compound_statement
+   65 conditional_statement: IF L_PAREN conditional_if R_PAREN compound_statement $@7 ELSE compound_statement .
 
-    $default  reduce using rule 71 ($@10)
-
-    $@10  go to state 243
+    $default  reduce using rule 65 (conditional_statement)
 
 
 State 241
 
-   83 increment_expression: increment_expression COMMA . statement_for
-   84                     | increment_expression COMMA . logical_expression
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN . $@11 compound_statement
+
+    $default  reduce using rule 72 ($@11)
+
+    $@11  go to state 244
+
+
+State 242
+
+   84 increment_expression: increment_expression COMMA . statement_for
+   85                     | increment_expression COMMA . logical_expression
 
     TRUE         shift, and go to state 45
     FALSE        shift, and go to state 46
@@ -3174,9 +3187,9 @@ State 241
     SCIENTIFIC   shift, and go to state 53
     STR_CONST    shift, and go to state 54
 
-    statement_for          go to state 244
+    statement_for          go to state 245
     variable_reference     go to state 199
-    logical_expression     go to state 245
+    logical_expression     go to state 246
     logical_term           go to state 57
     logical_factor         go to state 58
     relation_expression    go to state 59
@@ -3186,42 +3199,42 @@ State 241
     literal_const          go to state 63
 
 
-State 242
-
-   70 while_statement: $@9 DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON .
-
-    $default  reduce using rule 70 (while_statement)
-
-
 State 243
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 . compound_statement
+   71 while_statement: $@10 DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON .
 
-    $default  reduce using rule 46 ($@5)
-
-    compound_statement  go to state 246
-    $@5                 go to state 115
+    $default  reduce using rule 71 (while_statement)
 
 
 State 244
 
-   83 increment_expression: increment_expression COMMA statement_for .
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 . compound_statement
 
-    $default  reduce using rule 83 (increment_expression)
+    $default  reduce using rule 46 ($@5)
+
+    compound_statement  go to state 247
+    $@5                 go to state 115
 
 
 State 245
 
-   84 increment_expression: increment_expression COMMA logical_expression .
-   97 logical_expression: logical_expression . OR_OP logical_term
-
-    OR_OP  shift, and go to state 93
+   84 increment_expression: increment_expression COMMA statement_for .
 
     $default  reduce using rule 84 (increment_expression)
 
 
 State 246
 
-   72 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@10 compound_statement .
+   85 increment_expression: increment_expression COMMA logical_expression .
+   98 logical_expression: logical_expression . OR_OP logical_term
 
-    $default  reduce using rule 72 (for_statement)
+    OR_OP  shift, and go to state 93
+
+    $default  reduce using rule 85 (increment_expression)
+
+
+State 247
+
+   73 for_statement: FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN $@11 compound_statement .
+
+    $default  reduce using rule 73 (for_statement)

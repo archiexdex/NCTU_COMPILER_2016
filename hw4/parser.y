@@ -217,7 +217,6 @@ void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
 	char label1[100], label2[100];
 	if ( ( 1 < ta && ta < 4 )  || ( 1 < tb && tb < 4) ) {
 		fprintf(java, "fcmpl\n");	
-		fprintf(java, "fsub\n");
 	}
 	else {
 		fprintf(java, "isub\n");
@@ -231,6 +230,8 @@ void gen_rel(struct expr_sem *a, struct expr_sem *b, int mode) {
 	fprintf(java, "iconst_1\n");
 	fprintf(java, "%s:\n", label2);
 }
+//>>>>>>>>>>>>>>>>>>>> if statement
+
 
 
 //>>>>>>>>>>>>>>>>>>>> function 
@@ -265,6 +266,7 @@ void gen_funcRet(struct PType *ret){
 	fprintf(java,"%c\n",types[ret->type]);
 }
 void gen_funcEnd(){
+	fprintf(java, "return\n");
 	fprintf(java,".end method\n");
 }
 //>>>>>>>>>>>>>>>>>>>> invoke function 
@@ -777,11 +779,30 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 					}
 				 ;
 
-conditional_statement : IF L_PAREN conditional_if  R_PAREN compound_statement
-					  | IF L_PAREN conditional_if  R_PAREN compound_statement
-						ELSE compound_statement
+conditional_statement : IF L_PAREN conditional_if  R_PAREN compound_statement { 
+							char label[100];
+							sprintf(label, "Lelse%d",re0);
+							fprintf(java, "%s :\n", label);
+						 }
+					  | IF L_PAREN conditional_if  R_PAREN compound_statement { 
+							char label[100], exit[100];
+							sprintf(label, "Lelse%d",re0);
+							sprintf(exit, "Lexit%d",re0);
+							fprintf(java, "goto %s\n", exit);
+							fprintf(java, "%s :\n", label);
+						 }
+						ELSE compound_statement {
+							char exit[100];
+							sprintf(exit, "Lexit%d",re0);
+							fprintf(java, "%s :\n", exit);
+						}
 					  ;
-conditional_if : logical_expression { verifyBooleanExpr( $1, "if" ); };;					  
+conditional_if : logical_expression { 
+					verifyBooleanExpr( $1, "if" ); 
+					char label[100];
+					sprintf(label, "Lelse%d",re0);
+					fprintf(java, "ifeq %s\n", label);
+				}	
 
 				
 while_statement : WHILE L_PAREN logical_expression { verifyBooleanExpr( $3, "while" ); } R_PAREN { inloop++; }
@@ -885,6 +906,12 @@ jump_statement : CONTINUE SEMICOLON
 			   | RETURN logical_expression SEMICOLON
 				{
 					verifyReturnStatement( $2, funcReturn );
+					if ( $2->pType->type == 1 ){
+						fprintf(java, "ireturn\n");
+					}
+					else if( $2->pType->type == 2 || $2->pType->type == 3 ){
+						fprintf(java, "freturn\n");
+					}
 				}
 			   ;
 
