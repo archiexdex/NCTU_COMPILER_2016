@@ -44,10 +44,10 @@ void gen_load(struct expr_sem *expr ) {
 	struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
 	if ( node->scope ) {
 		
-		if ( tmp == 'I' ){
+		if ( tmp == 'I' || tmp == 'Z' ){
 			fprintf(java, "iload %d\n", node->addr);
 		}
-		else {
+		else if ( tmp == 'F' || tmp == 'D' ) {
 			fprintf(java, "fload %d\n", node->addr);	
 		}
 	}
@@ -62,7 +62,7 @@ void gen_store(struct expr_sem *expr) {
 	struct SymNode *node = lookupSymbol( symbolTable, expr->varRef->id, scope, __FALSE );
 	if (node->scope) {
 		
-		if ( tmp == 'I' ){
+		if ( tmp == 'I' || tmp == 'Z' ){
 			fprintf(java, "istore %d\n", node->addr);
 		}
 		else {
@@ -248,7 +248,7 @@ void gen_funcArg(struct param_sem* params){
 	fprintf(java, "(%s)", param);
 }
 void gen_funcMain() {
-	fprintf(java,"([Ljava/lang/String;)");
+	fprintf(java,"([Ljava/lang/String;)V\n");
 }
 void gen_funct(){
 	fprintf(java,".limit stack 128\n");
@@ -264,8 +264,18 @@ void gen_functMain(){
 void gen_funcRet(struct PType *ret){
 	fprintf(java,"%c\n",types[ret->type]);
 }
-void gen_funcEnd(){
-	fprintf(java, "return\n");
+void gen_funcEnd(struct PType *pType, char *id){
+	
+	if ( !strcmp("main", id) || pType == NULL ) {
+		fprintf(java, "return\n");	
+	}
+	else if ( pType->type == 1 ){
+		fprintf(java, "ireturn\n");
+	}
+	else if( pType->type == 2 || pType->type == 3 ){
+		fprintf(java, "freturn\n");
+	}
+	
 	fprintf(java,".end method\n");
 }
 //>>>>>>>>>>>>>>>>>>>> invoke function 
@@ -365,14 +375,15 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				}
 				else {
 					gen_funcArg(NULL);
+					gen_funcRet($1);
 				}
-				gen_funcRet($1);
+				
 				gen_funct();
 				if ( !strcmp("main",$2) ) {
 					gen_functMain();
 				}
 			}
-			compound_statement { funcReturn = 0; gen_funcEnd();}	
+			compound_statement { funcReturn = 0; gen_funcEnd($1,$2);}	
 		  | scalar_type ID L_PAREN parameter_list R_PAREN  
 			{				
 				funcReturn = $1;
@@ -407,8 +418,9 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					}
 					else {
 						gen_funcArg($4);
+						gen_funcRet($1);
 					}
-					gen_funcRet($1);
+					
 					gen_funct();
 					if ( !strcmp("main",$2) ) {
 						gen_functMain();
@@ -416,7 +428,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					log(top);
 				}
 			} 	
-			compound_statement { funcReturn = 0; gen_funcEnd(); }
+			compound_statement { funcReturn = 0; gen_funcEnd($1,$2); }
 		  | VOID ID L_PAREN R_PAREN 
 			{
 				funcReturn = createPType(VOID_t); 
@@ -437,14 +449,15 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				}
 				else {
 					gen_funcArg(NULL);
+					gen_funcRet(funcReturn);
 				}
-				gen_funcRet(funcReturn);
+				
 				gen_funct();
 				if ( !strcmp("main",$2) ) {
 					gen_functMain();
 				}
 			}
-			compound_statement { funcReturn = 0; gen_funcEnd(); }	
+			compound_statement { funcReturn = 0; gen_funcEnd(NULL,$2); }	
 		  | VOID ID L_PAREN parameter_list R_PAREN
 			{									
 				funcReturn = createPType(VOID_t);
@@ -479,15 +492,16 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 				}
 				else {
 					gen_funcArg($4);
+					gen_funcRet(funcReturn);
 				}
-				gen_funcRet(funcReturn);
+				
 				gen_funct();
 				if ( !strcmp("main",$2) ) {
 					gen_functMain();
 				}
 				log(top);
 			} 
-			compound_statement { funcReturn = 0; gen_funcEnd(); }		  
+			compound_statement { funcReturn = 0; gen_funcEnd(NULL,$2); }		  
 		  ;
 
 funct_decl : scalar_type ID L_PAREN R_PAREN SEMICOLON
@@ -759,6 +773,7 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 						if( flagLHS==__TRUE && flagRHS==__TRUE ){
 							verifyAssignmentTypeMatch( $1, $3 );
 							gen_store($1);
+							puts("!!");
 						}
 					}
 				 | PRINT { gen_print1(); } logical_expression SEMICOLON { 
@@ -778,12 +793,12 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
 					}
 				 ;
 
-conditional_statement : IF L_PAREN { ++re0; } conditional_if  R_PAREN compound_statement { 
+conditional_statement : IF L_PAREN R conditional_if  R_PAREN compound_statement { 
 							char label[100];
 							sprintf(label, "Lelse%d",re0);
 							fprintf(java, "%s :\n", label);
 						 }
-					  | IF L_PAREN { ++re0; } conditional_if  R_PAREN compound_statement { 
+					  | IF L_PAREN R conditional_if  R_PAREN compound_statement { 
 							char label[100], exit[100];
 							sprintf(label, "Lelse%d",re0);
 							sprintf(exit, "Lexit%d",re0);
@@ -796,6 +811,10 @@ conditional_statement : IF L_PAREN { ++re0; } conditional_if  R_PAREN compound_s
 							fprintf(java, "%s :\n", exit);
 						}
 					  ;
+
+R : { ++re0; }
+	;
+
 conditional_if : logical_expression { 
 					verifyBooleanExpr( $1, "if" ); 
 					char label[100];
@@ -973,12 +992,8 @@ jump_statement : CONTINUE SEMICOLON
 			   | RETURN logical_expression SEMICOLON
 				{
 					verifyReturnStatement( $2, funcReturn );
-					if ( $2->pType->type == 1 ){
-						fprintf(java, "ireturn\n");
-					}
-					else if( $2->pType->type == 2 || $2->pType->type == 3 ){
-						fprintf(java, "freturn\n");
-					}
+
+					
 				}
 			   ;
 
