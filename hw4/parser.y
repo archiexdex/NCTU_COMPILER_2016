@@ -23,6 +23,7 @@ struct PType *funcReturn;
 __BOOLEAN semError = __FALSE;
 int inloop = 0;
 
+int QQ[1000] = {0};
 int isMain = 0;
 const char  types[] = { 'V', 'I', 'F', 'D' ,'Z', 'X'};
 const char* reops[] = { "iflt", "ifle", "ifeq", "ifge", "ifgt", "ifne" };
@@ -64,6 +65,13 @@ void gen_load(struct expr_sem *expr ) {
 		else if ( tmp == 'F' || tmp == 'D' ) {
 			fprintf(java, "fload %d\n", node->addr);	
 		}
+	}
+	else if( node->category == CONSTANT_t ){
+		// printf("!!!!!>>> %d ",node->attribute->constVal->value);
+		if ( tmp == 'I' || tmp == 'Z' )
+			fprintf(java, "ldc %d\n", node->attribute->constVal->value);
+		else if ( tmp == 'F' || tmp == 'D' ) 
+			fprintf(java, "ldc %f\n", node->attribute->constVal->value);
 	}
 	else {
 		fprintf(java, "getstatic %s/%s %c\n", fileName, expr->varRef->id, tmp);
@@ -442,7 +450,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN
 					if ( !strcmp("main",$2) ) {
 						gen_functMain();
 					}
-					log(top);
+					// log(top);
 				}
 			} 	
 			compound_statement { funcReturn = 0; gen_funcEnd($1,$2); }
@@ -578,6 +586,8 @@ var_decl : scalar_type identifier_list SEMICOLON
 			{
 				struct varDeclParam *ptr;
 				struct SymNode *newNode;
+				int sum = -1;
+				memset(QQ,0,sizeof(QQ) );
 				for( ptr=$2 ; ptr!=0 ; ptr=(ptr->next) ) {						
 					if( verifyRedeclaration( symbolTable, ptr->para->idlist->value, scope ) == __FALSE ) { }
 					else {
@@ -592,9 +602,24 @@ var_decl : scalar_type identifier_list SEMICOLON
 							else {
 								newNode = createVarNode( ptr->para->idlist->value, scope, ptr->para->pType ,++top);
 								insertTab( symbolTable, newNode );
+								if ( ptr->isInit ==  __TRUE) {
+									
+									struct SymNode *node = lookupSymbol( symbolTable, ptr->para->idlist->value, scope, __FALSE );
+									QQ[++sum] = node->addr;
+								}
 							}
-							log(top);
+							
 						}
+					}
+				}
+				char tmp = types[$1->type];
+				int i = 0;
+				for ( i = sum ; i >= 0 ; --i ){
+					if ( tmp == 'I' || tmp == 'Z' ){
+						fprintf(java, "istore %d\n", QQ[i]);
+					}
+					else {
+						fprintf(java, "fstore %d\n", QQ[i]);	
 					}
 				}
 			}
@@ -619,6 +644,9 @@ identifier_list : identifier_list COMMA ID
 					vptr->isInit = __TRUE;	
 					addVarDeclParam( $1, vptr );	
 					$$ = $1;
+					if ( scope ){
+
+					}
 					
 				}
                 | identifier_list COMMA array_decl ASSIGN_OP initial_array

@@ -5,8 +5,7 @@ void srand( int seed );
 int rand();
 
 int main() {
-	int i = 1, grade;
-	
+	int i = 1, grade = 5, xd = 2;
 	srand( INITIALIZE );	// print "student (number)    (grade)    pass/fail"
 	
 	// print "student (number)    (grade)    pass/fail"

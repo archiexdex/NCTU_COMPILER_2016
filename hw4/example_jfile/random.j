@@ -26,11 +26,14 @@ putstatic example_jfile/random/_sc Ljava/util/Scanner;
 ; Line #7: int main() {
 
 ldc 1
-; Line #8: 	int i = 1, grade;
+ldc 2
+istore 2
+istore 0
+; Line #8: 	int i = 1, grade, xd = 2;
 
 ; Line #9: 	
 
-getstatic example_jfile/random/INITIALIZE I
+ldc 123456789
 invokestatic example_jfile/random/srand(I)V
 ; Line #10: 	srand( INITIALIZE );	// print "student (number)    (grade)    pass/fail"
 

@@ -32,8 +32,9 @@ int  main( int argc, char **argv )
 		for ( int i = 0 ; i < strlen(argv[1] ); ++i ){
 			fileName[i] = argv[1][i];
 		}
-		fileName[ strlen(argv[1]) ] = '\0';
-		fileName[ strlen(fileName)-1] = 'j';
+		// fileName[ strlen(argv[1]) ] = '\0';
+		// fileName[ strlen(fileName)-1] = 'j';
+		strcpy(fileName, "output.j");
 		java = fopen( fileName, "w" );
 		fprintf(java,"; %s\n",fileName);
 		fileName[ strlen(fileName)-2] = '\0';
